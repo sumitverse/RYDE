@@ -1,9 +1,9 @@
 {
   "version": 2,
-  "buildCommand": "cd CampusCycle && npm run build",
-  "outputDirectory": "CampusCycle/www",
-  "devCommand": "cd CampusCycle && npm start",
-  "installCommand": "cd CampusCycle && npm install",
+  "buildCommand": "npm run build",
+  "outputDirectory": "www",
+  "devCommand": "npm start",
+  "installCommand": "npm install",
   "framework": null,
   "rewrites": [
     {
