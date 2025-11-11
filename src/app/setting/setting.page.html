@@ -1,0 +1,149 @@
+<ion-header [translucent]="true" class="settings-header">
+  <ion-toolbar color="transparent" class="header-toolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" class="back-button">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="header-title">Settings</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="settings-content">
+  
+  <div class="profile-card-section">
+    <ion-card class="profile-card">
+      <ion-card-content>
+        <div class="profile-info">
+          <ion-avatar class="profile-avatar">
+            <img [src]="userAvatar" [alt]="userName" />
+          </ion-avatar>
+          <div class="profile-details">
+            <h2 class="profile-name">{{ userName }}</h2>
+            <p class="profile-email">{{ userEmail }}</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  
+  <div class="settings-sections" *ngFor="let section of settingsSections; let i = index">
+    <div class="section-header">
+      <ion-icon [name]="section.icon" class="section-icon"></ion-icon>
+      <h3 class="section-title">{{ section.title }}</h3>
+    </div>
+
+    <ion-card class="settings-card">
+      <ion-card-content>
+        <ion-list>
+          <ion-item 
+            *ngFor="let item of section.items" 
+            lines="none"
+            class="setting-item"
+            [class.item-toggle]="item.type === 'toggle'"
+            [class.item-input]="item.type === 'input'"
+            [class.item-select]="item.type === 'select'"
+            [class.item-button]="item.type === 'button'">
+            
+            
+            <div *ngIf="item.type === 'toggle'" class="toggle-item-content">
+              <div class="item-left">
+                <div class="item-icon-wrapper" [style.background]="getIconBackground(section.title)">
+                  <ion-icon [name]="item.icon || 'settings-outline'" class="item-icon"></ion-icon>
+                </div>
+                <div class="item-text">
+                  <ion-label class="item-label">{{ item.label }}</ion-label>
+                  <p class="item-description" *ngIf="item.description">{{ item.description }}</p>
+                </div>
+              </div>
+              <ion-toggle 
+                [checked]="item.value"
+                (ionChange)="onToggleChange(item.id, $event.detail.checked)"
+                color="success"
+                class="setting-toggle">
+              </ion-toggle>
+            </div>
+
+            
+            <div *ngIf="item.type === 'input'" class="input-item-content">
+              <div class="item-left">
+                <div class="item-icon-wrapper" [style.background]="getIconBackground(section.title)">
+                  <ion-icon [name]="item.icon || 'create-outline'" class="item-icon"></ion-icon>
+                </div>
+                <div class="item-text">
+                  <ion-label class="item-label">{{ item.label }}</ion-label>
+                </div>
+              </div>
+              <ion-input 
+                [value]="getInputValue(item.id)"
+                [placeholder]="item.placeholder"
+                (ionInput)="onInputChange(item.id, $event.detail.value!)"
+                class="setting-input">
+              </ion-input>
+            </div>
+
+            
+            <div *ngIf="item.type === 'select'" class="select-item-content">
+              <div class="item-left">
+                <div class="item-icon-wrapper" [style.background]="getIconBackground(section.title)">
+                  <ion-icon [name]="item.icon || 'chevron-down-outline'" class="item-icon"></ion-icon>
+                </div>
+                <div class="item-text">
+                  <ion-label class="item-label">{{ item.label }}</ion-label>
+                </div>
+              </div>
+              <ion-select 
+                [value]="item.value"
+                (ionChange)="onSelectChange(item.id, $event.detail.value)"
+                interface="popover"
+                class="setting-select">
+                <ion-select-option *ngFor="let option of item.options" [value]="option.value">
+                  {{ option.label }}
+                </ion-select-option>
+              </ion-select>
+            </div>
+
+            
+            <div *ngIf="item.type === 'button'" class="button-item-content" (click)="item.action?.()">
+              <div class="item-left">
+                <div class="item-icon-wrapper" [style.background]="getIconBackground(section.title)">
+                  <ion-icon [name]="item.icon || 'chevron-forward-outline'" class="item-icon"></ion-icon>
+                </div>
+                <div class="item-text">
+                  <ion-label class="item-label">{{ item.label }}</ion-label>
+                </div>
+              </div>
+              <ion-icon name="chevron-forward-outline" class="chevron-icon"></ion-icon>
+            </div>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  
+  <div class="logout-section">
+    <ion-button 
+      expand="block" 
+      fill="outline" 
+      color="danger" 
+      (click)="logout()" 
+      class="logout-button">
+      <ion-icon name="log-out-outline" slot="start"></ion-icon>
+      Logout
+    </ion-button>
+  </div>
+
+  
+  <div class="save-section">
+    <ion-button 
+      expand="block" 
+      color="success" 
+      (click)="saveSettings()" 
+      class="save-button">
+      <ion-icon name="save-outline" slot="start"></ion-icon>
+      Save All Settings
+    </ion-button>
+  </div>
+</ion-content>

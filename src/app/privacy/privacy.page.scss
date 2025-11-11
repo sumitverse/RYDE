@@ -1,0 +1,383 @@
+$primary-color: #10B981;
+$accent-color: #059669;
+$secondary-color: #34D399;
+$background-color: #F9FAFB;
+$card-background: #FFFFFF;
+$text-primary: #1F2937;
+$text-secondary: #4B5563;
+$text-light: #6B7280;
+$border-color: #E5E7EB;
+$card-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+$card-shadow-hover: 0 8px 24px rgba(16, 185, 129, 0.15);
+$gradient-primary: linear-gradient(135deg, #10B981 0%, #059669 100%);
+$gradient-accent: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+
+$font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.privacy-content {
+  --background: $background-color;
+  font-family: $font-family;
+}
+
+ion-header {
+  ion-toolbar {
+    --background: $card-background;
+    --color: $text-primary;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  ion-title {
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+}
+
+.privacy-header {
+  background: $gradient-primary;
+  padding: 3rem 1.5rem 2rem;
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.6s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="2" fill="%2310B981" opacity="0.1"/><circle cx="80" cy="80" r="2" fill="%2310B981" opacity="0.1"/></svg>');
+    opacity: 0.3;
+  }
+
+  .header-icon-wrapper {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 1rem;
+    animation: scaleIn 0.6s ease 0.2s both;
+
+    .header-icon {
+      font-size: 4rem;
+      color: white;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+      animation: pulse 2s ease-in-out infinite;
+    }
+  }
+
+  .header-title {
+    position: relative;
+    z-index: 1;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    animation: fadeInUp 0.6s ease 0.3s both;
+  }
+
+  .header-subtitle {
+    position: relative;
+    z-index: 1;
+    font-size: 1rem;
+    margin: 0 0 1.5rem;
+    opacity: 0.95;
+    font-weight: 500;
+    animation: fadeInUp 0.6s ease 0.4s both;
+  }
+
+  .last-updated {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    animation: fadeInUp 0.6s ease 0.5s both;
+
+    ion-icon {
+      font-size: 1rem;
+    }
+  }
+}
+
+.privacy-sections {
+  padding: 1.5rem;
+  animation: fadeInUp 0.6s ease 0.2s both;
+
+  .privacy-card {
+    margin: 0 0 1.5rem;
+    border-radius: 20px;
+    box-shadow: $card-shadow;
+    border: 1px solid $border-color;
+    background: $card-background;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.6s ease both;
+
+    &:hover {
+      box-shadow: $card-shadow-hover;
+      transform: translateY(-2px);
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    ion-card-header {
+      padding: 1.5rem 1.5rem 1rem;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.02) 100%);
+      border-bottom: 2px solid rgba(16, 185, 129, 0.1);
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        .section-icon-wrapper {
+          width: 48px;
+          height: 48px;
+          border-radius: 12px;
+          background: $gradient-primary;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+
+          .section-icon {
+            font-size: 1.5rem;
+            color: white;
+          }
+        }
+
+        .section-title {
+          flex: 1;
+          font-size: 1.2rem;
+          font-weight: 700;
+          color: $text-primary;
+          margin: 0;
+        }
+      }
+    }
+
+    ion-card-content {
+      padding: 1.5rem;
+
+      .section-content {
+        color: $text-secondary;
+        line-height: 1.8;
+        font-size: 0.95rem;
+        white-space: pre-line;
+      }
+    }
+  }
+}
+
+.privacy-footer {
+  padding: 1.5rem;
+  margin-top: 1rem;
+
+  .footer-card {
+    margin: 0;
+    border-radius: 20px;
+    box-shadow: $card-shadow;
+    background: $gradient-primary;
+    color: white;
+    border: none;
+
+    ion-card-content {
+      padding: 2rem 1.5rem;
+
+      .footer-content {
+        text-align: center;
+
+        .footer-icon {
+          font-size: 3rem;
+          color: white;
+          margin-bottom: 1rem;
+          filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+        }
+
+        h3 {
+          font-size: 1.5rem;
+          font-weight: 700;
+          margin: 0 0 0.75rem;
+          color: white;
+        }
+
+        p {
+          font-size: 1rem;
+          margin: 0 0 1.5rem;
+          opacity: 0.95;
+          line-height: 1.6;
+        }
+
+        .footer-badges {
+          display: flex;
+          justify-content: center;
+          gap: 1rem;
+          flex-wrap: wrap;
+
+          .badge-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+
+            ion-icon {
+              font-size: 1.1rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.contact-section {
+  padding: 0 1.5rem 2rem;
+
+  .contact-card {
+    margin: 0;
+    border-radius: 20px;
+    box-shadow: $card-shadow;
+    border: 2px solid $primary-color;
+    background: $card-background;
+
+    ion-card-header {
+      padding: 1.5rem 1.5rem 0.5rem;
+
+      ion-card-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: $text-primary;
+      }
+    }
+
+    ion-card-content {
+      padding: 1rem 1.5rem 1.5rem;
+
+      p {
+        color: $text-secondary;
+        line-height: 1.6;
+        margin: 0 0 1rem;
+      }
+
+      .contact-button {
+        --border-radius: 12px;
+        --border-width: 2px;
+        --border-color: $primary-color;
+        --color: $primary-color;
+        font-weight: 600;
+        height: 48px;
+        margin-top: 0.5rem;
+
+        ion-icon {
+          font-size: 1.2rem;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .privacy-header {
+    padding: 2rem 1rem 1.5rem;
+
+    .header-icon-wrapper .header-icon {
+      font-size: 3rem;
+    }
+
+    .header-title {
+      font-size: 1.5rem;
+    }
+  }
+
+  .privacy-sections {
+    padding: 1rem;
+
+    .privacy-card {
+      ion-card-header {
+        padding: 1rem 1rem 0.75rem;
+
+        .section-header {
+          .section-icon-wrapper {
+            width: 40px;
+            height: 40px;
+
+            .section-icon {
+              font-size: 1.2rem;
+            }
+          }
+
+          .section-title {
+            font-size: 1rem;
+          }
+        }
+      }
+
+      ion-card-content {
+        padding: 1rem;
+
+        .section-content {
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+
+  .footer-badges {
+    flex-direction: column;
+    align-items: stretch;
+
+    .badge-item {
+      justify-content: center;
+    }
+  }
+}
+
+.privacy-content {
+  scroll-behavior: smooth;
+}

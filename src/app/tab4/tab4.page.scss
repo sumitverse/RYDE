@@ -1,0 +1,625 @@
+$primary-color: #10B981;
+$accent-color: #059669;
+$secondary-color: #34D399;
+$background-color: #FFFFFF;
+$card-background: #FFFFFF;
+$text-primary: #1F2937;
+$text-secondary: #4B5563;
+$text-light: #6B7280;
+$success-color: #10B981;
+$error-color: #EF4444;
+$warning-color: #F59E0B;
+$border-color: #E5E7EB;
+$card-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+$card-shadow-hover: 0 8px 24px rgba(16, 185, 129, 0.15);
+$gradient-primary: linear-gradient(135deg, #10B981 0%, #059669 100%);
+$gradient-accent: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+$gradient-wallet: linear-gradient(135deg, #10B981 0%, #34D399 50%, #059669 100%);
+$font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.wallet-content {
+  --background: linear-gradient(to bottom, #F0FDF4 0%, #FFFFFF 100%);
+  font-family: $font-family;
+}
+
+.wallet-header {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%);
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.12);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+
+  .header-toolbar {
+    --background: transparent;
+    --color: $primary-color;
+    padding: 0.5rem 1rem;
+    min-height: 70px;
+  }
+
+  .header-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: $text-primary;
+    background: $gradient-primary;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+
+    .title-icon {
+      font-size: 1.75rem;
+      color: $primary-color;
+    }
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 1rem;
+  color: $text-secondary;
+
+  ion-spinner {
+    --color: $primary-color;
+  }
+}
+
+.content-wrapper {
+  padding: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.balance-card {
+  background: $gradient-wallet;
+  border-radius: 24px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 32px rgba(16, 185, 129, 0.25);
+  color: white;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  .balance-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    .balance-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      opacity: 0.9;
+      font-weight: 500;
+
+      ion-icon {
+        font-size: 1.25rem;
+      }
+    }
+
+    .eye-btn {
+      --color: white;
+      opacity: 0.9;
+    }
+  }
+
+  .balance-amount {
+    margin-bottom: 1rem;
+
+    .amount {
+      font-size: 3rem;
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    .amount-hidden {
+      font-size: 3rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+  }
+
+  .balance-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .status-chip {
+      --background: rgba(255, 255, 255, 0.2);
+      --color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+  }
+}
+
+.qr-code-section {
+  margin-bottom: 1.5rem;
+
+  .section-header {
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: $text-primary;
+      margin: 0;
+
+      ion-icon {
+        font-size: 1.25rem;
+        color: $primary-color;
+      }
+    }
+  }
+
+  .qr-code-card {
+    border-radius: 20px;
+    box-shadow: $card-shadow;
+    border: 1px solid $border-color;
+    margin: 0;
+    overflow: hidden;
+
+    ion-card-content {
+      padding: 1.5rem;
+    }
+
+    .qr-code-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #F0FDF4 0%, #FFFFFF 100%);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      min-height: 300px;
+      position: relative;
+
+      .qr-code-image {
+        max-width: 100%;
+        height: auto;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        display: block;
+      }
+
+      .qr-error {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        color: $error-color;
+        text-align: center;
+
+        ion-icon {
+          font-size: 3rem;
+        }
+
+        p {
+          margin: 0;
+          font-size: 0.9rem;
+        }
+      }
+    }
+
+    .qr-code-hint {
+      text-align: center;
+      color: $text-secondary;
+      font-size: 0.875rem;
+      margin: 0;
+      font-weight: 500;
+    }
+  }
+}
+
+.quick-actions-section {
+  margin-bottom: 1.5rem;
+
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .actions-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 0.75rem;
+
+    .action-card {
+      background: $card-background;
+      border-radius: 16px;
+      padding: 1rem 0.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: $card-shadow;
+      border: 1px solid $border-color;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:active {
+        transform: scale(0.95);
+        box-shadow: $card-shadow-hover;
+      }
+
+      .action-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+
+        &.add-money {
+          background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+          color: white;
+        }
+
+        &.send-money {
+          background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+          color: white;
+        }
+
+        &.transactions {
+          background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%);
+          color: white;
+        }
+
+        &.qr-code {
+          background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+          color: white;
+        }
+      }
+
+      .action-label {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: $text-primary;
+        text-align: center;
+      }
+    }
+  }
+}
+
+.transactions-section {
+  margin-bottom: 1.5rem;
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: $text-primary;
+      margin: 0;
+
+      ion-icon {
+        font-size: 1.25rem;
+        color: $primary-color;
+      }
+    }
+  }
+
+  .empty-card {
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      gap: 1rem;
+      color: $text-light;
+
+      ion-icon {
+        font-size: 3rem;
+        color: $border-color;
+      }
+    }
+  }
+
+  .transactions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .transaction-card {
+    border-radius: 16px;
+    box-shadow: $card-shadow;
+    border: 1px solid $border-color;
+    margin: 0;
+    animation: slideIn 0.4s ease-out;
+
+    ion-card-content {
+      padding: 1rem;
+    }
+
+    .transaction-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .transaction-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+
+        &[color="success"] {
+          background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+          color: white;
+        }
+
+        &[color="medium"] {
+          background: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
+          color: white;
+        }
+      }
+
+      .transaction-details {
+        flex: 1;
+        min-width: 0;
+
+        .transaction-title {
+          font-weight: 600;
+          color: $text-primary;
+          font-size: 0.95rem;
+          margin-bottom: 0.25rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .transaction-meta {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+
+          .transaction-date {
+            font-size: 0.75rem;
+            color: $text-light;
+          }
+
+          .status-chip {
+            font-size: 0.65rem;
+            height: 1.25rem;
+          }
+        }
+      }
+
+      .transaction-amount {
+        font-weight: 700;
+        font-size: 1rem;
+        flex-shrink: 0;
+
+        &.credit {
+          color: $success-color;
+        }
+
+        &.debit {
+          color: $text-primary;
+        }
+
+        .amount-sign {
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
+.stats-section {
+  margin-bottom: 2rem;
+
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+
+    .stat-card {
+      background: $card-background;
+      border-radius: 16px;
+      padding: 1rem;
+      box-shadow: $card-shadow;
+      border: 1px solid $border-color;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+
+      .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+
+        &.credit-stat {
+          background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+          color: white;
+        }
+
+        &.debit-stat {
+          background: linear-gradient(135deg, #EF4444 0%, #F87171 100%);
+          color: white;
+        }
+
+        &.transaction-stat {
+          background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%);
+          color: white;
+        }
+      }
+
+      .stat-content {
+        .stat-value {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: $text-primary;
+          line-height: 1.2;
+        }
+
+        .stat-label {
+          font-size: 0.75rem;
+          color: $text-light;
+          margin-top: 0.25rem;
+        }
+      }
+    }
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@media (max-width: 480px) {
+  .balance-card {
+    padding: 1.5rem;
+
+    .balance-amount .amount,
+    .balance-amount .amount-hidden {
+      font-size: 2.5rem;
+    }
+  }
+
+  .actions-grid {
+    gap: 0.5rem;
+
+    .action-card {
+      padding: 0.75rem 0.25rem;
+
+      .action-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+      }
+
+      .action-label {
+        font-size: 0.7rem;
+      }
+    }
+  }
+
+  .stats-grid {
+    gap: 0.5rem;
+
+    .stat-card {
+      padding: 0.75rem;
+
+      .stat-content .stat-value {
+        font-size: 1.1rem;
+      }
+    }
+  }
+}

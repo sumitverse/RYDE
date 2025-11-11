@@ -1,0 +1,172 @@
+<ion-header [translucent]="true" class="wallet-header">
+  <ion-toolbar color="transparent" class="header-toolbar">
+    <ion-title class="header-title">
+      <ion-icon name="wallet-outline" class="title-icon"></ion-icon>
+      Wallet
+    </ion-title>
+    <ion-button fill="clear" slot="end" (click)="refreshWallet()" [disabled]="isLoading">
+      <ion-icon name="refresh-outline" [class.spinning]="isLoading"></ion-icon>
+    </ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="wallet-content">
+  
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Loading wallet...</p>
+  </div>
+
+  
+  <div *ngIf="!isLoading" class="content-wrapper">
+    
+    
+    <div class="balance-card fade-in">
+      <div class="balance-header">
+        <div class="balance-label">
+          <ion-icon name="wallet-outline"></ion-icon>
+          <span>Wallet Balance</span>
+        </div>
+        <ion-button fill="clear" size="small" (click)="toggleBalanceVisibility()" class="eye-btn">
+          <ion-icon [name]="showBalance ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
+        </ion-button>
+      </div>
+      <div class="balance-amount">
+        <span *ngIf="showBalance" class="amount">₹{{ walletBalance.toFixed(2) }}</span>
+        <span *ngIf="!showBalance" class="amount-hidden">••••••</span>
+      </div>
+      <div class="balance-footer">
+        <ion-chip color="success" class="status-chip">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <ion-label>Active</ion-label>
+        </ion-chip>
+      </div>
+    </div>
+
+    
+    <div class="quick-actions-section fade-in">
+      <h3 class="section-title">Quick Actions</h3>
+      <div class="actions-grid">
+        <div class="action-card" (click)="addMoney()">
+          <div class="action-icon add-money">
+            <ion-icon name="add-outline"></ion-icon>
+          </div>
+          <div class="action-label">Add Money</div>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="qr-code-section fade-in">
+      <div class="section-header">
+        <h3 class="section-title">
+          <ion-icon name="qr-code-outline"></ion-icon>
+          UPI QR Code
+        </h3>
+      </div>
+      <ion-card class="qr-code-card">
+        <ion-card-content>
+          <div class="qr-code-container">
+            <img 
+              src="https://raw.githubusercontent.com/sumitverse/monkey-banana/main/WhatsApp%20Image%202025-11-09%20at%2000.18.45_1ac31441.jpg"
+              alt="UPI QR Code"
+              class="qr-code-image"
+              (error)="onQrImageError($event)" />
+            <div *ngIf="qrImageError" class="qr-error">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              <p>Failed to load QR code</p>
+            </div>
+
+          </div>
+          <p class="qr-code-hint">Scan this QR code to make payments</p>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    
+    <div class="transactions-section fade-in">
+      <div class="section-header">
+        <h3 class="section-title">
+          <ion-icon name="time-outline"></ion-icon>
+          Recent Transactions
+        </h3>
+      </div>
+
+      <ion-card *ngIf="getRecentTransactions().length === 0" class="empty-card">
+        <ion-card-content>
+          <div class="empty-state">
+            <ion-icon name="wallet-outline"></ion-icon>
+            <p>No transactions yet</p>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <div *ngIf="getRecentTransactions().length > 0" class="transactions-list">
+        <ion-card 
+          *ngFor="let transaction of getRecentTransactions(); let i = index" 
+          class="transaction-card"
+          [style.animation-delay]="i * 0.1 + 's'">
+          <ion-card-content>
+            <div class="transaction-item">
+              <div class="transaction-icon" [attr.color]="getTransactionColor(transaction)">
+                <ion-icon [name]="getTransactionIcon(transaction)"></ion-icon>
+              </div>
+              <div class="transaction-details">
+                <div class="transaction-title">{{ transaction.description }}</div>
+                <div class="transaction-meta">
+                  <ion-chip 
+                    [color]="transaction.status === 'completed' ? 'success' : transaction.status === 'pending' ? 'warning' : 'danger'"
+                    size="small"
+                    class="status-chip">
+                    {{ transaction.status }}
+                  </ion-chip>
+                </div>
+              </div>
+              <div class="transaction-amount" [class.credit]="transaction.type === 'credit'" [class.debit]="transaction.type === 'debit'">
+                <span *ngIf="transaction.type === 'credit'" class="amount-sign">+</span>
+                <span *ngIf="transaction.type === 'debit'" class="amount-sign">-</span>
+                ₹{{ transaction.amount.toFixed(2) }}
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    
+    <div class="stats-section fade-in">
+      <h3 class="section-title">This Month</h3>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon credit-stat">
+            <ion-icon name="trending-up-outline"></ion-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">₹{{ getTotalCredits().toFixed(2) }}</div>
+            <div class="stat-label">Total Added</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon debit-stat">
+            <ion-icon name="trending-down-outline"></ion-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">₹{{ getTotalDebits().toFixed(2) }}</div>
+            <div class="stat-label">Total Spent</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon transaction-stat">
+            <ion-icon name="flash-outline"></ion-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{ transactions.length }}</div>
+            <div class="stat-label">Transactions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</ion-content>
+

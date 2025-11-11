@@ -1,0 +1,129 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/tab1"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Offer Details</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="offer" class="offer-details-content">
+  
+  <div class="offer-image-section">
+    <img [src]="offer.image" [alt]="offer.title" class="offer-main-image" />
+    <div class="offer-badge-overlay" *ngIf="offer.discount">
+      <div class="discount-badge">
+        {{ offer.discount }}
+      </div>
+    </div>
+  </div>
+
+  
+  <ion-card class="offer-info-card">
+    <ion-card-header>
+      <ion-card-title class="offer-title">{{ offer.title }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p class="offer-description">{{ offer.description }}</p>
+
+      
+      <div class="coupon-code-section" *ngIf="offer.code">
+        <div class="coupon-code-header">
+          <ion-icon name="ticket-outline"></ion-icon>
+          <span>Coupon Code</span>
+        </div>
+        <div class="coupon-code-display">
+          <span class="coupon-code">{{ offer.code }}</span>
+        </div>
+      </div>
+
+      
+      <div class="discount-details">
+        <div class="discount-item">
+          <ion-icon name="gift-outline" color="warning"></ion-icon>
+          <div class="discount-info">
+            <span class="discount-label">Discount</span>
+            <span class="discount-value">{{ offer.discount || (offer.discountPercent + '%') }}</span>
+          </div>
+        </div>
+        <div class="discount-item" *ngIf="offer.validUntil">
+          <ion-icon name="calendar-outline" color="primary"></ion-icon>
+          <div class="discount-info">
+            <span class="discount-label">Valid Until</span>
+            <span class="discount-value">{{ formatDate(offer.validUntil) }}</span>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="terms-section" *ngIf="offer.terms">
+        <div class="terms-header">
+          <ion-icon name="informationCircleOutline"></ion-icon>
+          <span>Terms & Conditions</span>
+        </div>
+        <p class="terms-text">{{ offer.terms }}</p>
+      </div>
+
+      
+      <div class="action-buttons">
+        <ion-button 
+          *ngIf="!isApplied"
+          expand="block" 
+          color="primary" 
+          (click)="applyCoupon()"
+          class="apply-button">
+          <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+          Apply Coupon
+        </ion-button>
+        <ion-button 
+          *ngIf="isApplied"
+          expand="block" 
+          color="success" 
+          (click)="removeCoupon()"
+          class="remove-button">
+          <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+          Coupon Applied
+        </ion-button>
+      </div>
+
+      
+      <div class="applied-status" *ngIf="isApplied">
+        <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+        <span>This coupon will be applied to your next ride booking</span>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  
+  <ion-card class="how-it-works-card">
+    <ion-card-header>
+      <ion-card-title>How It Works</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Apply Coupon</h4>
+            <p>Tap "Apply Coupon" to activate this offer</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Book a Ride</h4>
+            <p>Book any cycle from the home page</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Enjoy Discount</h4>
+            <p>The discount will be applied when you end your ride</p>
+          </div>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
+

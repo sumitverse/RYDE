@@ -1,0 +1,739 @@
+$primary-color: #10B981;
+$accent-color: #059669;
+$secondary-color: #34D399;
+$background: #FFFFFF;
+$card-background: #FFFFFF;
+$white: #FFFFFF;
+$text-primary: #1F2937;
+$text-secondary: #4B5563;
+$text-light: #6B7280;
+$error: #EF4444;
+$success: #10B981;
+$border-color: #E5E7EB;
+$shadow: rgba(16, 185, 129, 0.08);
+$shadow-hover: rgba(16, 185, 129, 0.15);
+$card-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+$card-shadow-hover: 0 8px 24px rgba(16, 185, 129, 0.15);
+$gradient-primary: linear-gradient(135deg, #10B981 0%, #059669 100%);
+
+$font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+}
+
+@keyframes floatReverse {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(20px) rotate(-5deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bicycleMove {
+  0% {
+    transform: translateX(-10px);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+  100% {
+    transform: translateX(-10px);
+  }
+}
+
+@keyframes wheelSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.login-content {
+  --background: #{$background};
+  font-family: $font-family;
+  position: relative;
+  overflow: hidden;
+}
+
+.animated-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  background: #{$background};
+  background-size: 400% 400%;
+
+  .floating-shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.03;
+    animation: float 20s infinite ease-in-out;
+    filter: blur(40px);
+  }
+
+  .shape-1 {
+    width: 300px;
+    height: 300px;
+    background: $primary-color;
+    top: -100px;
+    left: -100px;
+    animation-duration: 25s;
+  }
+
+  .shape-2 {
+    width: 200px;
+    height: 200px;
+    background: $accent-color;
+    top: 20%;
+    right: -50px;
+    animation-duration: 20s;
+    animation-name: floatReverse;
+  }
+
+  .shape-3 {
+    width: 250px;
+    height: 250px;
+    background: $secondary-color;
+    bottom: 10%;
+    left: 10%;
+    animation-duration: 30s;
+  }
+
+  .shape-4 {
+    width: 180px;
+    height: 180px;
+    background: $accent-color;
+    top: 50%;
+    left: 50%;
+    animation-duration: 22s;
+    animation-name: floatReverse;
+  }
+
+  .shape-5 {
+    width: 220px;
+    height: 220px;
+    background: $primary-color;
+    bottom: -50px;
+    right: 10%;
+    animation-duration: 28s;
+  }
+
+  .shape-6 {
+    width: 150px;
+    height: 150px;
+    background: $secondary-color;
+    top: 70%;
+    right: 20%;
+    animation-duration: 24s;
+    animation-name: floatReverse;
+  }
+}
+
+.login-container {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1.5rem;
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+.logo-section {
+  text-align: center;
+  margin-bottom: 2rem;
+  animation: fadeIn 0.8s ease;
+
+    .logo-container {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 1.5rem;
+      background: $gradient-primary;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+      animation: pulse 2s ease-in-out infinite;
+      transition: transform 0.3s ease;
+
+      &:active {
+        transform: scale(0.95);
+      }
+
+      .logo-icon {
+        font-size: 3.5rem;
+        color: $white;
+      }
+    }
+
+    .app-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: $primary-color;
+      margin: 0 0 0.5rem 0;
+    }
+
+  .app-subtitle {
+    font-size: 1rem;
+    color: $text-secondary;
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+.photo-upload-section {
+  margin-bottom: 1.5rem;
+  animation: fadeIn 0.8s ease 0.2s both;
+
+  .photo-preview-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+
+    .photo-preview {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+      border: 3px solid $primary-color;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+
+      &:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+      }
+
+      &.has-photo {
+        border-color: $primary-color;
+      }
+
+      .preview-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+
+      .placeholder-icon {
+        font-size: 3.5rem;
+        color: $primary-color;
+        opacity: 0.5;
+      }
+
+      .photo-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+        color: $white;
+        padding: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        font-size: 0.7rem;
+        font-weight: 600;
+
+        ion-icon {
+          font-size: 1rem;
+        }
+      }
+
+      &:hover .photo-overlay {
+        opacity: 1;
+      }
+    }
+
+    .photo-upload-btn {
+      --color: $primary-color;
+      --background: transparent;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: none;
+      margin: 0;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      border: 2px solid $primary-color;
+      transition: all 0.3s ease;
+
+      &:active {
+        transform: scale(0.95);
+        --background: rgba(16, 185, 129, 0.1);
+      }
+
+      ion-icon {
+        font-size: 1.2rem;
+      }
+    }
+  }
+}
+
+.form-container {
+  width: 100%;
+  background: $card-background;
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: $card-shadow;
+  border: 1px solid $border-color;
+  animation: slideUp 0.8s ease;
+}
+
+.auth-form {
+  .input-group {
+    margin-bottom: 1.5rem;
+
+      .custom-input {
+        --background: $white;
+        --border-radius: 12px;
+        --padding-start: 1rem;
+        --padding-end: 1rem;
+        --min-height: 56px;
+        margin-bottom: 0.5rem;
+        border: 2px solid $border-color;
+        transition: all 0.3s ease;
+        box-shadow: $card-shadow;
+        background: $white;
+
+        &:focus-within {
+          border-color: $primary-color;
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+          transform: translateY(-2px);
+        }
+
+      .input-icon {
+        color: $primary-color;
+        font-size: 1.3rem;
+        margin-right: 0.5rem;
+      }
+
+      .input-field {
+        --color: $text-primary;
+        font-size: 1rem;
+      }
+
+      .eye-button {
+        --color: $text-secondary;
+        margin: 0;
+        --padding: 0;
+      }
+    }
+
+    .error-message {
+      color: $error;
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+      margin-left: 1rem;
+      font-weight: 500;
+      animation: fadeIn 0.3s ease;
+    }
+  }
+
+  .form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    .remember-me {
+      --background: transparent;
+      --padding-start: 0;
+      --padding-end: 0;
+      --min-height: auto;
+
+      ion-label {
+        font-size: 0.9rem;
+        color: $text-secondary;
+        margin-left: 0.5rem;
+      }
+    }
+
+    .forgot-password {
+      --color: $primary-color;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-transform: none;
+      margin: 0;
+      --padding: 0;
+    }
+  }
+
+  .primary-button {
+    --background: $gradient-primary;
+    --color: $white;
+    --border-radius: 16px;
+    --box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    height: 56px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-transform: none;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    &:hover {
+      --box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+      transform: translateY(-2px);
+    }
+
+    &[disabled] {
+      opacity: 0.6;
+    }
+  }
+}
+
+.social-login {
+  margin: 2rem 0;
+
+  .divider {
+    text-align: center;
+    margin: 1.5rem 0;
+    position: relative;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.1), transparent);
+    }
+
+    &::before {
+      left: 0;
+    }
+
+    &::after {
+      right: 0;
+    }
+
+    span {
+      color: $text-secondary;
+      font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 0 1rem;
+      position: relative;
+      z-index: 1;
+    }
+  }
+
+  .social-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+
+    .social-button {
+      --border-radius: 15px;
+      --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      width: 56px;
+      height: 56px;
+      margin: 0;
+      transition: all 0.3s ease;
+
+      &:active {
+        transform: scale(0.9);
+      }
+
+      ion-icon {
+        font-size: 1.5rem;
+      }
+
+      &.google {
+        --background: $white;
+        --color: #4285F4;
+
+        &:hover {
+          --box-shadow: 0 6px 20px rgba(66, 133, 244, 0.3);
+          transform: translateY(-3px);
+        }
+      }
+
+      &.facebook {
+        --background: $white;
+        --color: #1877F2;
+
+        &:hover {
+          --box-shadow: 0 6px 20px rgba(24, 119, 242, 0.3);
+          transform: translateY(-3px);
+        }
+      }
+
+      &.apple {
+        --background: $white;
+        --color: #000000;
+
+        &:hover {
+          --box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+          transform: translateY(-3px);
+        }
+      }
+    }
+  }
+}
+
+.toggle-mode {
+  text-align: center;
+  margin-top: 1.5rem;
+
+  p {
+    color: $text-secondary;
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  .toggle-button {
+    --color: $primary-color;
+    font-weight: 600;
+    text-transform: none;
+    margin: 0;
+    --padding: 0;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+
+  .loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+
+    .cycle-loader-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 80px;
+
+      .cycle-loader-icon {
+        font-size: 4rem;
+        color: $primary-color;
+        animation: cycleSpin 1s ease-in-out infinite;
+        filter: drop-shadow(0 4px 8px rgba(16, 185, 129, 0.3));
+      }
+    }
+
+    .loading-text {
+      color: $text-primary;
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin: 0;
+      text-align: center;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes cycleSpin {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translateY(-10px) rotate(5deg) scale(1.1);
+  }
+  50% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  75% {
+    transform: translateY(-10px) rotate(-5deg) scale(1.1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.primary-button {
+  position: relative;
+
+  .button-loading-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .button-spinner {
+    width: 18px;
+    height: 18px;
+  }
+
+  .button-loading-text {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .form-container {
+    padding: 1.5rem;
+    border-radius: 25px;
+  }
+
+  .logo-section {
+    .logo-container {
+      width: 80px;
+      height: 80px;
+
+      .logo-icon {
+        font-size: 2.5rem;
+      }
+    }
+
+    .app-title {
+      font-size: 2rem;
+    }
+  }
+
+  .social-buttons {
+    gap: 0.75rem;
+
+    .social-button {
+      width: 50px;
+      height: 50px;
+
+      ion-icon {
+        font-size: 1.3rem;
+      }
+    }
+  }
+}
+
+.primary-button,
+.social-button,
+.toggle-button,
+.forgot-password {
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+* {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}

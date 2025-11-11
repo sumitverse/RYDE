@@ -1,0 +1,224 @@
+<ion-header [translucent]="true" class="schedule-header">
+  <ion-toolbar color="transparent" class="header-toolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" class="back-btn">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="header-title">Schedule Rides</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="openNewScheduleModal()" class="add-btn">
+        <ion-icon name="add-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="schedule-content">
+  
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Loading schedules...</p>
+  </div>
+
+  
+  <div *ngIf="!isLoading" class="content-wrapper">
+    
+    <div *ngIf="scheduledRides.length === 0" class="empty-state fade-in">
+      <div class="empty-icon-container">
+        <ion-icon name="calendar-outline" class="empty-icon"></ion-icon>
+      </div>
+      <h3>No Scheduled Rides</h3>
+      <p>Plan your rides ahead of time for a better experience!</p>
+      <ion-button color="primary" (click)="openNewScheduleModal()" class="create-btn">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Create Schedule
+      </ion-button>
+    </div>
+
+    
+    <div *ngIf="scheduledRides.length > 0" class="schedules-list">
+      <div 
+        *ngFor="let ride of scheduledRides; let i = index" 
+        class="schedule-card fade-in"
+        [style.animation-delay]="i * 0.1 + 's'"
+        [class.past-schedule]="isPastSchedule(ride)">
+        <ion-card class="ride-card">
+          <ion-card-header>
+            <div class="card-header-content">
+              <div class="schedule-title-section">
+                <ion-card-title class="ride-title">
+                  <ion-icon name="bicycle-outline"></ion-icon>
+                  {{ ride.title }}
+                </ion-card-title>
+                <div class="schedule-date">
+                  <ion-icon name="calendar-outline"></ion-icon>
+                  <span>{{ formatDate(ride.date) }}</span>
+                </div>
+              </div>
+              <ion-badge [color]="getStatusColor(ride.status)" class="status-badge">
+                <ion-icon [name]="getStatusIcon(ride.status)"></ion-icon>
+                {{ ride.status | titlecase }}
+              </ion-badge>
+            </div>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="schedule-details">
+              <div class="detail-item">
+                <div class="detail-icon time">
+                  <ion-icon name="time-outline"></ion-icon>
+                </div>
+                <div class="detail-content">
+                  <div class="detail-label">Time</div>
+                  <div class="detail-value">{{ ride.time }}</div>
+                </div>
+              </div>
+
+              <div class="detail-item">
+                <div class="detail-icon location">
+                  <ion-icon name="location-outline"></ion-icon>
+                </div>
+                <div class="detail-content">
+                  <div class="detail-label">Location</div>
+                  <div class="detail-value">{{ ride.location }}</div>
+                </div>
+              </div>
+
+              <div class="detail-item" *ngIf="ride.cycleType">
+                <div class="detail-icon cycle">
+                  <ion-icon name="bicycle-outline"></ion-icon>
+                </div>
+                <div class="detail-content">
+                  <div class="detail-label">Cycle Type</div>
+                  <div class="detail-value">{{ ride.cycleType }}</div>
+                </div>
+              </div>
+
+              <div class="detail-item" *ngIf="ride.notes">
+                <div class="detail-icon notes">
+                  <ion-icon name="document-text-outline"></ion-icon>
+                </div>
+                <div class="detail-content">
+                  <div class="detail-label">Notes</div>
+                  <div class="detail-value">{{ ride.notes }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-actions">
+              <ion-button 
+                fill="outline" 
+                size="small" 
+                color="primary"
+                (click)="openEditModal(ride)"
+                class="action-btn">
+                <ion-icon name="create-outline" slot="start"></ion-icon>
+                Edit
+              </ion-button>
+              <ion-button 
+                fill="outline" 
+                size="small" 
+                color="danger"
+                (click)="deleteSchedule(ride.id)"
+                class="action-btn">
+                <ion-icon name="trash-outline" slot="start"></ion-icon>
+                Delete
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+  </div>
+</ion-content>
+
+
+<ion-modal [isOpen]="isModalOpen" (willDismiss)="closeModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ isEditing ? 'Edit Schedule' : 'New Schedule' }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeModal()">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="modal-content">
+      <div class="modal-form">
+        <ion-item class="form-item">
+          <ion-label position="stacked">Title *</ion-label>
+          <ion-input 
+            [(ngModel)]="newSchedule.title" 
+            placeholder="e.g., Morning Ride to Campus"
+            required>
+          </ion-input>
+        </ion-item>
+
+        <ion-item class="form-item">
+          <ion-label position="stacked">Date *</ion-label>
+          <ion-input 
+            type="date" 
+            [(ngModel)]="newSchedule.date"
+            required>
+          </ion-input>
+        </ion-item>
+
+        <ion-item class="form-item">
+          <ion-label position="stacked">Time *</ion-label>
+          <ion-input 
+            type="time" 
+            [(ngModel)]="newSchedule.time"
+            required>
+          </ion-input>
+        </ion-item>
+
+        <ion-item class="form-item">
+          <ion-label position="stacked">Location *</ion-label>
+          <ion-input 
+            [(ngModel)]="newSchedule.location" 
+            placeholder="e.g., Main Campus - Building A"
+            required>
+          </ion-input>
+        </ion-item>
+
+        <ion-item class="form-item">
+          <ion-label position="stacked">Cycle Type</ion-label>
+          <ion-input 
+            [(ngModel)]="newSchedule.cycleType" 
+            placeholder="e.g., Electric, Regular">
+          </ion-input>
+        </ion-item>
+
+        <ion-item class="form-item">
+          <ion-label position="stacked">Notes</ion-label>
+          <ion-textarea 
+            [(ngModel)]="newSchedule.notes" 
+            placeholder="Additional notes..."
+            rows="3">
+          </ion-textarea>
+        </ion-item>
+
+        <div class="modal-actions">
+          <ion-button 
+            expand="block" 
+            color="primary" 
+            (click)="saveSchedule()"
+            class="save-btn">
+            <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+            {{ isEditing ? 'Update Schedule' : 'Create Schedule' }}
+          </ion-button>
+          <ion-button 
+            expand="block" 
+            fill="outline" 
+            color="medium" 
+            (click)="closeModal()"
+            class="cancel-btn">
+            Cancel
+          </ion-button>
+        </div>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

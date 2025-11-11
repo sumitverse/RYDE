@@ -1,0 +1,379 @@
+$primary-color: #10B981;
+$accent-color: #059669;
+$secondary-color: #34D399;
+$background-color: #FFFFFF;
+$card-background: #FFFFFF;
+$white: #FFFFFF;
+$text-primary: #1F2937;
+$text-secondary: #4B5563;
+$text-light: #6B7280;
+$border-color: #E5E7EB;
+$card-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+$card-shadow-hover: 0 8px 24px rgba(16, 185, 129, 0.15);
+$gradient-primary: linear-gradient(135deg, #10B981 0%, #059669 100%);
+$gradient-accent: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+
+$font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.about-content {
+  --background: linear-gradient(to bottom, #F0FDF4 0%, #FFFFFF 100%);
+  font-family: $font-family;
+}
+
+.about-header {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%);
+  box-shadow: 0 2px 12px rgba(16, 185, 129, 0.1);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+
+  .header-toolbar {
+    --background: transparent;
+    --color: $primary-color;
+    padding: 0.5rem 1rem;
+  }
+
+  .back-button {
+    --color: $primary-color;
+    --padding-start: 8px;
+    --padding-end: 8px;
+    margin: 0;
+
+    ion-icon {
+      font-size: 1.5rem;
+    }
+  }
+
+  .header-title {
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
+    background: $gradient-primary;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+.hero-section {
+  position: relative;
+  background: $gradient-primary;
+  padding: 3rem 1.5rem 4rem;
+  text-align: center;
+  color: $white;
+  animation: fadeIn 0.6s ease;
+  overflow: hidden;
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="2" fill="%2310B981" opacity="0.1"/><circle cx="80" cy="80" r="2" fill="%2310B981" opacity="0.1"/></svg>');
+    opacity: 0.3;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .app-logo-container {
+    margin-bottom: 1.5rem;
+    animation: scaleIn 0.6s ease 0.2s both;
+
+    .app-logo {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 4px solid $white;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+
+      .logo-icon {
+        font-size: 3.5rem;
+        color: $white;
+      }
+    }
+  }
+
+  .app-name {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    color: $white;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    animation: fadeInUp 0.6s ease 0.3s both;
+  }
+
+  .app-tagline {
+    font-size: 1.1rem;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 500;
+    animation: fadeInUp 0.6s ease 0.4s both;
+  }
+}
+
+.content-section {
+  padding: 1.5rem;
+  animation: fadeInUp 0.6s ease;
+
+  .section-header {
+    margin-bottom: 1rem;
+
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: $text-primary;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+}
+
+.about-section {
+  margin-top: -2rem;
+  position: relative;
+  z-index: 1;
+
+  .info-card {
+    margin: 0;
+    border-radius: 20px;
+    box-shadow: $card-shadow;
+    background: $card-background;
+    border: none;
+    animation: fadeInUp 0.6s ease 0.2s both;
+
+    ion-card-content {
+      padding: 1.5rem;
+
+      .description {
+        margin: 0 0 1rem;
+        font-size: 1rem;
+        line-height: 1.7;
+        color: $text-secondary;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+.features-section {
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+
+    .feature-item {
+      background: $card-background;
+      border-radius: 16px;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      box-shadow: $card-shadow;
+      border: 1px solid $border-color;
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.6s ease;
+
+      &:active {
+        transform: scale(0.98);
+        box-shadow: $card-shadow-hover;
+        border-color: $primary-color;
+      }
+
+      .feature-icon-wrapper {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 1rem;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+
+        .feature-icon {
+          font-size: 2rem;
+          color: $primary-color;
+        }
+      }
+
+      .feature-title {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: $text-primary;
+      }
+    }
+  }
+}
+
+.contact-section {
+  .contact-card {
+    margin: 0;
+    border-radius: 20px;
+    box-shadow: $card-shadow;
+    background: $card-background;
+    border: none;
+
+    ion-card-content {
+      padding: 0;
+
+      .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+        transition: all 0.3s ease;
+
+        .contact-icon-wrapper {
+          width: 48px;
+          height: 48px;
+          border-radius: 12px;
+          background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          .contact-icon {
+            font-size: 1.5rem;
+            color: $primary-color;
+          }
+        }
+
+        .contact-info {
+          flex: 1;
+
+          .contact-value {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 500;
+            color: $text-primary;
+          }
+        }
+      }
+
+      .contact-divider {
+        height: 1px;
+        background: $border-color;
+        margin: 0 1.5rem;
+      }
+    }
+  }
+}
+
+.footer-section {
+  padding: 2rem 1.5rem 3rem;
+  text-align: center;
+  animation: fadeInUp 0.6s ease 0.8s both;
+
+  .footer-copyright {
+    margin: 0;
+    font-size: 0.8rem;
+    color: $text-light;
+    opacity: 0.7;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    padding: 2rem 1rem 3rem;
+
+    .app-logo-container .app-logo {
+      width: 80px;
+      height: 80px;
+
+      .logo-icon {
+        font-size: 2.8rem;
+      }
+    }
+
+    .app-name {
+      font-size: 2rem;
+    }
+
+    .app-tagline {
+      font-size: 1rem;
+    }
+  }
+
+  .features-section .features-grid {
+    gap: 0.75rem;
+
+    .feature-item {
+      padding: 1.25rem 0.75rem;
+
+      .feature-icon-wrapper {
+        width: 50px;
+        height: 50px;
+
+        .feature-icon {
+          font-size: 1.75rem;
+        }
+      }
+
+      .feature-title {
+        font-size: 0.85rem;
+      }
+    }
+  }
+
+  .content-section {
+    padding: 1rem;
+  }
+}
+
+* {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}

@@ -1,0 +1,456 @@
+$primary-color: #10B981;
+$accent-color: #059669;
+$secondary-color: #34D399;
+$background-color: #FFFFFF;
+$card-background: #FFFFFF;
+$text-primary: #1F2937;
+$text-secondary: #4B5563;
+$text-light: #6B7280;
+$success-color: #10B981;
+$error-color: #EF4444;
+$border-color: #E5E7EB;
+$card-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+$card-shadow-hover: 0 8px 24px rgba(16, 185, 129, 0.15);
+$gradient-primary: linear-gradient(135deg, #10B981 0%, #059669 100%);
+$gradient-accent: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+
+$font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.schedule-header {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%);
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.12);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+
+  .header-toolbar {
+    --background: transparent;
+    --color: $text-primary;
+    padding: 0.5rem 1rem;
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .back-btn,
+    .add-btn {
+      --color: $primary-color;
+      --padding-start: 0.5rem;
+      --padding-end: 0.5rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+
+      &:active {
+        transform: scale(0.95);
+        background: rgba(16, 185, 129, 0.1);
+      }
+
+      ion-icon {
+        font-size: 1.5rem;
+      }
+    }
+
+    .header-title {
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: $text-primary;
+      background: $gradient-primary;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  }
+}
+
+.schedule-content {
+  --background: linear-gradient(to bottom, #F0FDF4 0%, #FFFFFF 100%);
+  font-family: $font-family;
+}
+
+.content-wrapper {
+  padding: 1rem;
+  padding-bottom: 2rem;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
+  gap: 1rem;
+
+  p {
+    color: $text-secondary;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+  min-height: 50vh;
+
+  .empty-icon-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: $gradient-primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+    animation: pulse 2s ease-in-out infinite;
+
+    .empty-icon {
+      font-size: 4rem;
+      color: white;
+    }
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0 0 0.5rem 0;
+  }
+
+  p {
+    font-size: 1rem;
+    color: $text-secondary;
+    margin: 0 0 2rem 0;
+    line-height: 1.6;
+  }
+
+  .create-btn {
+    --border-radius: 16px;
+    font-weight: 600;
+    text-transform: none;
+    padding: 0.75rem 2rem;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    transition: all 0.3s ease;
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+}
+
+.schedules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.schedule-card {
+  animation: fadeIn 0.6s ease forwards;
+  opacity: 0;
+
+  &.past-schedule {
+    opacity: 0.6;
+  }
+}
+
+.ride-card {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%);
+  border-radius: 24px;
+  box-shadow: $card-shadow;
+  border: none;
+  margin: 0;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: $gradient-primary;
+    border-radius: 24px 24px 0 0;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $card-shadow-hover;
+  }
+
+  ion-card-header {
+    padding: 1.25rem 1.25rem 0.75rem;
+
+    .card-header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+
+      .schedule-title-section {
+        flex: 1;
+
+        .ride-title {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 1.2rem;
+          font-weight: 700;
+          color: $text-primary;
+          margin: 0 0 0.5rem 0;
+
+          ion-icon {
+            font-size: 1.5rem;
+            color: $primary-color;
+          }
+        }
+
+        .schedule-date {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          font-size: 0.9rem;
+          color: $text-secondary;
+          font-weight: 500;
+
+          ion-icon {
+            font-size: 1rem;
+            color: $accent-color;
+          }
+        }
+      }
+
+      .status-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        white-space: nowrap;
+
+        ion-icon {
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+
+  ion-card-content {
+    padding: 0 1.25rem 1.25rem;
+
+    .schedule-details {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+
+      .detail-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+
+        .detail-icon {
+          width: 40px;
+          height: 40px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+
+          ion-icon {
+            font-size: 1.3rem;
+          }
+
+          &.time {
+            background: rgba(16, 185, 129, 0.15);
+            ion-icon {
+              color: $primary-color;
+            }
+          }
+
+          &.location {
+            background: rgba(5, 150, 105, 0.15);
+            ion-icon {
+              color: $accent-color;
+            }
+          }
+
+          &.cycle {
+            background: rgba(52, 211, 153, 0.15);
+            ion-icon {
+              color: $secondary-color;
+            }
+          }
+
+          &.notes {
+            background: rgba(107, 114, 128, 0.15);
+            ion-icon {
+              color: $text-secondary;
+            }
+          }
+        }
+
+        .detail-content {
+          flex: 1;
+
+          .detail-label {
+            font-size: 0.75rem;
+            color: $text-light;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+
+          .detail-value {
+            font-size: 0.95rem;
+            color: $text-primary;
+            font-weight: 600;
+            line-height: 1.4;
+          }
+        }
+      }
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.75rem;
+      padding-top: 1rem;
+      border-top: 1px solid $border-color;
+
+      .action-btn {
+        flex: 1;
+        --border-radius: 12px;
+        font-weight: 600;
+        text-transform: none;
+        font-size: 0.85rem;
+        margin: 0;
+
+        ion-icon {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+}
+
+.modal-content {
+  --background: #{$background-color};
+  font-family: $font-family;
+
+  .modal-form {
+    padding: 1.5rem;
+
+    .form-item {
+      --background: transparent;
+      --padding-start: 0;
+      --padding-end: 0;
+      --inner-padding-end: 0;
+      --inner-padding-start: 0;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid $border-color;
+
+      ion-label {
+        color: $text-primary;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+      }
+
+      ion-input,
+      ion-textarea {
+        --color: $text-primary;
+        --padding-start: 0;
+        --padding-end: 0;
+        font-size: 1rem;
+      }
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 2rem;
+
+      .save-btn {
+        --border-radius: 16px;
+        font-weight: 600;
+        text-transform: none;
+        height: 48px;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+
+        &:active {
+          transform: scale(0.98);
+        }
+      }
+
+      .cancel-btn {
+        --border-radius: 16px;
+        font-weight: 600;
+        text-transform: none;
+        height: 48px;
+      }
+    }
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease forwards;
+}
+
+@media (min-width: 768px) {
+  .content-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .schedules-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}

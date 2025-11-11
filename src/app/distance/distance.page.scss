@@ -1,0 +1,619 @@
+$primary-color: #10B981;
+$accent-color: #059669;
+$secondary-color: #34D399;
+$background-color: #FFFFFF;
+$card-background: #FFFFFF;
+$text-primary: #1F2937;
+$text-secondary: #4B5563;
+$text-light: #6B7280;
+$success-color: #10B981;
+$border-color: #E5E7EB;
+$card-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+$card-shadow-hover: 0 8px 24px rgba(16, 185, 129, 0.15);
+$gradient-primary: linear-gradient(135deg, #10B981 0%, #059669 100%);
+$gradient-accent: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+
+$font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+.distance-header {
+  .header-toolbar {
+    --background: #{$background-color};
+    --color: $text-primary;
+    min-height: 56px;
+    border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    ion-title {
+      color: $text-primary;
+      font-weight: 700;
+      font-size: 1.5rem;
+      text-align: center;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      letter-spacing: -0.5px;
+      background: $gradient-primary;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: auto;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    ion-buttons {
+      position: absolute;
+      left: 0;
+      z-index: 10;
+    }
+
+    ion-back-button {
+      --color: $primary-color;
+      --icon-font-size: 1.5rem;
+    }
+  }
+}
+
+.distance-content {
+  --background: #{$background-color};
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  font-family: $font-family;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+.stats-hero {
+  background: $gradient-primary;
+  padding: 2rem 1.5rem;
+  color: white;
+  margin-bottom: 1rem;
+  margin-top: 0;
+  position: relative;
+  z-index: 1;
+
+  .hero-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+
+    .hero-icon {
+      font-size: 3.5rem;
+      opacity: 0.9;
+    }
+
+    .hero-stats {
+      flex: 1;
+
+      .hero-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 0.5rem;
+
+        .unit {
+          font-size: 1.2rem;
+          font-weight: 400;
+          margin-left: 0.25rem;
+          opacity: 0.9;
+        }
+      }
+
+      .hero-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-bottom: 0.5rem;
+      }
+
+      .hero-subtitle {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+
+        ion-icon {
+          font-size: 1rem;
+        }
+
+        .trend-up {
+          color: #4ade80;
+        }
+
+        .trend-down {
+          color: #f87171;
+        }
+
+        .trend-label {
+          opacity: 0.8;
+          margin-left: 0.25rem;
+        }
+      }
+    }
+  }
+}
+
+.period-selector {
+  padding: 1rem;
+  background: white;
+  margin-bottom: 1rem;
+
+  ion-segment {
+    --background: #f1f5f9;
+    border-radius: 12px;
+    padding: 4px;
+
+    ion-segment-button {
+      --indicator-color: transparent;
+      --color-checked: white;
+      --color: #{$text-secondary};
+      --background-checked: #{$primary-color};
+      --background-hover: rgba(16, 185, 129, 0.1);
+      min-height: 40px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+
+      ion-label {
+        color: #{$text-secondary};
+        font-weight: 500;
+      }
+
+      &.segment-button-checked {
+        background: #{$primary-color};
+
+        ion-label {
+          color: white !important;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding: 0 1rem;
+  margin-bottom: 1rem;
+
+  .metric-card {
+    margin: 0;
+    border-radius: 16px;
+    box-shadow: $card-shadow;
+
+    ion-card-content {
+      padding: 1.25rem;
+      text-align: center;
+
+      .metric-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+
+        &.rides {
+          background: $gradient-primary;
+          color: white;
+        }
+
+        &.average {
+          background: $gradient-accent;
+          color: white;
+        }
+
+        &.speed {
+          background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+          color: white;
+        }
+
+        &.time {
+          background: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+          color: white;
+        }
+      }
+
+      .metric-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: $text-primary;
+        margin-bottom: 0.5rem;
+
+        .unit-small {
+          font-size: 1rem;
+          font-weight: 500;
+          color: $text-secondary;
+          margin-left: 0.25rem;
+        }
+      }
+
+      .metric-label {
+        font-size: 0.85rem;
+        color: $text-secondary;
+      }
+    }
+  }
+}
+
+.impact-section {
+  padding: 0 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .impact-card {
+    margin: 0;
+    border-radius: 16px;
+    overflow: hidden;
+
+    &.carbon {
+      background: $gradient-accent;
+      color: white;
+    }
+
+    &.money {
+      background: $gradient-primary;
+      color: white;
+    }
+
+    ion-card-content {
+      padding: 1.5rem;
+
+      .impact-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+
+        ion-icon {
+          font-size: 2.5rem;
+          opacity: 0.9;
+        }
+
+        .impact-info {
+          flex: 1;
+
+          .impact-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+
+            .unit-small {
+              font-size: 1.2rem;
+              font-weight: 500;
+              margin-left: 0.25rem;
+            }
+          }
+
+          .impact-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+          }
+        }
+      }
+
+      .impact-description {
+        font-size: 0.85rem;
+        opacity: 0.85;
+        padding-top: 0.75rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+}
+
+.chart-card {
+  margin: 0 1rem 1rem;
+  border-radius: 16px;
+  box-shadow: $card-shadow;
+
+  ion-card-header {
+    padding-bottom: 0.5rem;
+
+    ion-card-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: $text-primary;
+
+      ion-icon {
+        font-size: 1.25rem;
+        color: $primary-color;
+      }
+    }
+  }
+
+  .chart-container {
+    padding: 1rem 0;
+
+    .chart-bars {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 0.5rem;
+      min-height: 200px;
+
+      &.horizontal {
+        flex-direction: column;
+        gap: 1rem;
+        min-height: auto;
+      }
+
+      .chart-bar-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+
+        &.horizontal {
+          flex-direction: row;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .bar-wrapper {
+          width: 100%;
+          height: 150px;
+          display: flex;
+          align-items: flex-end;
+          justify-content: center;
+
+          &.horizontal {
+            flex: 1;
+            height: 24px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            overflow: hidden;
+          }
+
+          .bar {
+            width: 80%;
+            background: $gradient-primary;
+            border-radius: 8px 8px 0 0;
+            min-height: 4px;
+            transition: height 0.3s ease;
+
+            &.has-rides {
+              background: $gradient-accent;
+            }
+
+            &.horizontal {
+              height: 100%;
+              border-radius: 12px;
+              width: auto;
+            }
+          }
+        }
+
+        .bar-label {
+          font-size: 0.75rem;
+          color: $text-secondary;
+          font-weight: 500;
+          text-align: center;
+        }
+
+        .bar-value {
+          font-size: 0.7rem;
+          color: $text-primary;
+          font-weight: 600;
+          text-align: center;
+        }
+
+        .bar-rides {
+          font-size: 0.65rem;
+          color: $text-light;
+          text-align: center;
+        }
+
+        .bar-info {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+          min-width: 80px;
+        }
+      }
+    }
+  }
+}
+
+.milestones-card {
+  margin: 0 1rem 1rem;
+  border-radius: 16px;
+  box-shadow: $card-shadow;
+
+  ion-card-header {
+    ion-card-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: $text-primary;
+
+      ion-icon {
+        font-size: 1.25rem;
+        color: $primary-color;
+      }
+    }
+  }
+
+  .milestones-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+
+    .milestone-item {
+      position: relative;
+
+      .milestone-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+
+        .milestone-label {
+          font-weight: 600;
+          color: $text-primary;
+          font-size: 1rem;
+        }
+
+        .milestone-progress {
+          font-size: 0.85rem;
+          color: $text-secondary;
+        }
+      }
+
+      ion-progress-bar {
+        height: 8px;
+        border-radius: 4px;
+        --background: #f1f5f9;
+        --progress-background: $gradient-primary;
+
+        &.completed {
+          --progress-background: $gradient-accent;
+        }
+      }
+
+      .milestone-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+        color: #10b981;
+        font-size: 0.85rem;
+        font-weight: 600;
+
+        ion-icon {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+}
+
+.recent-rides-card {
+  margin: 0 1rem 1rem;
+  border-radius: 16px;
+  box-shadow: $card-shadow;
+
+  ion-card-header {
+    ion-card-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: $text-primary;
+
+      ion-icon {
+        font-size: 1.25rem;
+        color: $primary-color;
+      }
+    }
+  }
+
+  .rides-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .ride-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: #f8fafc;
+      border-radius: 12px;
+      border-left: 4px solid $primary-color;
+
+      .ride-date {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: $text-secondary;
+        font-size: 0.9rem;
+        font-weight: 500;
+
+        ion-icon {
+          font-size: 1rem;
+        }
+      }
+
+      .ride-details {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.5rem;
+
+        .ride-distance {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: $text-primary;
+
+          ion-icon {
+            font-size: 1.1rem;
+            color: $primary-color;
+          }
+        }
+
+        .ride-meta {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          .ride-duration {
+            font-size: 0.8rem;
+            color: $text-light;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-bars {
+    gap: 0.25rem !important;
+
+    .bar-label {
+      font-size: 0.65rem !important;
+    }
+  }
+}

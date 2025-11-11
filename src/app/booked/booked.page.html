@@ -1,0 +1,80 @@
+<ion-content class="booked-content" [fullscreen]="true">
+  
+  <div class="confetti-container" *ngIf="showConfetti">
+    <div 
+      class="confetti" 
+      *ngFor="let item of confettiItems; let idx = index" 
+      [style.animation-delay]="item.delay + 's'"
+      [style.left]="item.left + '%'"
+      [style.background]="item.color">
+    </div>
+  </div>
+
+  
+  <div class="booked-wrapper">
+    
+    <div class="success-icon-container">
+      <div class="success-circle">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+      </div>
+    </div>
+
+    
+    <h1 class="congratulations-title">Congratulations!</h1>
+    <p class="booking-confirmed-text">Booking Confirmed</p>
+
+    
+    <div class="cycle-card-container" *ngIf="cycle">
+      <ion-card class="cycle-card">
+        <ion-card-content>
+          
+          <div class="cycle-image-wrapper">
+            <img [src]="cycle.thumbnail" [alt]="cycle.title" class="cycle-image" />
+            <div class="cycle-badge" *ngIf="cycle.battery">
+              <ion-icon name="flash-outline"></ion-icon>
+              <span>{{ cycle.battery }}%</span>
+            </div>
+            <div class="cycle-status-badge">
+              <ion-badge color="success">Booked</ion-badge>
+            </div>
+          </div>
+
+          
+          <div class="cycle-info">
+            <h2 class="cycle-name">{{ cycle.title }}</h2>
+
+            
+            <div class="cycle-price-section">
+              <span class="price-label">Price per minute</span>
+              <div class="price-value">₹{{ cycle.price }}</div>
+            </div>
+
+            
+            <div class="cycle-battery-section" *ngIf="cycle.battery">
+              <div class="battery-icon">
+                <ion-icon name="flash-outline"></ion-icon>
+              </div>
+              <div class="battery-info">
+                <div class="battery-label">Battery Level</div>
+                <div class="battery-value">{{ cycle.battery }}%</div>
+                <ion-progress-bar
+                  [value]="cycle.battery / 100"
+                  [color]="getBatteryColor(cycle.battery)"
+                  class="battery-progress">
+                </ion-progress-bar>
+              </div>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    
+    <div class="action-button-wrapper">
+      <ion-button expand="block" size="large" color="primary" (click)="goToTab1()" class="ok-button">
+        <span>OK</span>
+        <ion-icon name="checkmark-circle-outline" slot="end"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

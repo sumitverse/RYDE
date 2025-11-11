@@ -1,0 +1,90 @@
+<ion-header [translucent]="true" class="about-header">
+  <ion-toolbar color="transparent" class="header-toolbar">
+    <ion-button fill="clear" slot="start" (click)="goBack()" class="back-button">
+      <ion-icon name="chevron-back-outline"></ion-icon>
+    </ion-button>
+    <ion-title class="header-title">About Us</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="about-content">
+  
+  <div class="hero-section">
+    <div class="hero-background"></div>
+    <div class="hero-content">
+      <div class="app-logo-container">
+        <div class="app-logo">
+          <ion-icon name="bicycle-outline" class="logo-icon"></ion-icon>
+        </div>
+      </div>
+      <h1 class="app-name">RYDE</h1>
+      <p class="app-tagline">Ride Smart, Ride Green</p>
+    </div>
+  </div>
+
+  
+  <div class="content-section about-section">
+    <ion-card class="info-card">
+      <ion-card-content>
+        <p class="description">
+          RYDE is a bicycle sharing platform designed to make campus transportation 
+          eco-friendly, convenient, and affordable. We connect students and faculty with 
+          accessible bicycles, promoting sustainable mobility and a healthier lifestyle.
+        </p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  
+  <div class="content-section features-section">
+    <div class="section-header">
+      <h2 class="section-title">Why Choose RYDE?</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-item" *ngFor="let feature of features">
+        <div class="feature-icon-wrapper">
+          <ion-icon [name]="feature.icon" class="feature-icon"></ion-icon>
+        </div>
+        <h4 class="feature-title">{{ feature.title }}</h4>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="content-section contact-section">
+    <div class="section-header">
+      <h2 class="section-title">Get in Touch</h2>
+    </div>
+    <ion-card class="contact-card">
+      <ion-card-content>
+        <div class="contact-item">
+          <div class="contact-icon-wrapper">
+            <ion-icon name="mail-outline" class="contact-icon"></ion-icon>
+          </div>
+          <div class="contact-info">
+            <p class="contact-value">support@ryde.com</p>
+          </div>
+        </div>
+        <div class="contact-divider"></div>
+        <div class="contact-item">
+          <div class="contact-icon-wrapper">
+            <ion-icon name="call-outline" class="contact-icon"></ion-icon>
+          </div>
+          <div class="contact-info">
+            <p class="contact-value">+91 9576877877</p>
+          </div>
+        </div>
+        <div class="contact-divider"></div>
+        <div class="contact-item">
+          <div class="contact-icon-wrapper">
+            <ion-icon name="location-outline" class="contact-icon"></ion-icon>
+          </div>
+          <div class="contact-info">
+            <p class="contact-value">Campus LPU Boys Hostel 5</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+</ion-content>

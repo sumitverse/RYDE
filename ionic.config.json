@@ -1,0 +1,7 @@
+{
+  "name": "RYDE",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

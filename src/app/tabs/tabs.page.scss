@@ -1,0 +1,359 @@
+$primary-color: #10B981;
+$accent-color: #059669;
+$secondary-color: #34D399;
+$white: #FFFFFF;
+$text-primary: #1F2937;
+$text-secondary: #4B5563;
+$text-light: #6B7280;
+$gradient-primary: linear-gradient(135deg, #10B981 0%, #059669 100%);
+$gradient-accent: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+
+@keyframes tabIconBounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.1);
+  }
+}
+
+@keyframes tabPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.custom-tab-bar {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F0FDF4 100%);
+  border-top: 1px solid rgba(16, 185, 129, 0.1);
+  box-shadow: 0 -4px 20px rgba(16, 185, 129, 0.08);
+  padding: 0.5rem 0;
+  height: 70px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: $gradient-primary;
+    opacity: 0.3;
+  }
+
+  ion-tab-button {
+    --color: #{$text-secondary};
+    --color-selected: #{$primary-color};
+    min-width: auto;
+    flex: 1 1 auto;
+    padding: 0.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: visible;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%) scaleX(0);
+      width: 40px;
+      height: 3px;
+      background: $gradient-primary;
+      border-radius: 0 0 3px 3px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+    }
+
+    &.tab-selected {
+      --color: #{$primary-color};
+      animation: tabPulse 0.4s ease-out;
+
+      &::before {
+        transform: translateX(-50%) scaleX(1);
+        opacity: 1;
+      }
+
+      .icon-wrapper {
+        .tab-icon {
+          display: none;
+        }
+
+        .tab-icon-selected {
+          display: block;
+          animation: tabIconBounce 0.5s ease-out;
+          color: $primary-color;
+        }
+      }
+
+      .tab-label {
+        color: $primary-color;
+        font-weight: 600;
+        transform: scale(1.05);
+      }
+
+      ion-label {
+        color: $primary-color;
+        font-weight: 600;
+      }
+    }
+
+    .icon-wrapper {
+      position: relative;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.25rem;
+
+      .tab-icon {
+        display: block;
+        font-size: 1.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        color: $text-secondary;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .tab-icon-selected {
+        display: none;
+        font-size: 1.6rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        color: $primary-color;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    .tab-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      margin-top: 0.25rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: $text-secondary;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: clip;
+      max-width: none;
+      width: auto;
+    }
+
+    ion-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      margin-top: 0.25rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: $text-secondary;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: clip;
+      max-width: none;
+      width: auto;
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    &:hover:not(.tab-selected) {
+      .icon-wrapper .tab-icon {
+        color: $primary-color;
+        transform: translate(-50%, calc(-50% - 2px)) scale(1.1);
+      }
+
+      .tab-label {
+        color: $primary-color;
+      }
+    }
+  }
+
+  .custom-tab-button {
+    position: relative;
+    flex: 1 1 auto;
+    max-width: none;
+    min-width: auto;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    border-radius: 12px 12px 0 0;
+    margin: 0 0.25rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: visible;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(16, 185, 129, 0.05);
+      border-radius: 12px 12px 0 0;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    &.tab-selected {
+      &::after {
+        opacity: 1;
+      }
+
+      .icon-wrapper .tab-icon {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+      }
+
+      .icon-wrapper .tab-icon-selected {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+    }
+  }
+}
+
+ion-tab-button.tab-selected {
+  .custom-tab-button {
+    background: linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, transparent 100%);
+  }
+
+  .icon-wrapper {
+    .tab-icon {
+      display: none !important;
+    }
+
+    .tab-icon-selected {
+      display: block !important;
+      animation: tabIconBounce 0.5s ease-out;
+      color: $primary-color;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  .tab-label,
+  ion-label {
+    color: $primary-color !important;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    max-width: none;
+    width: auto;
+  }
+}
+
+@media (max-width: 360px) {
+  .custom-tab-bar {
+    height: 65px;
+    padding: 0.4rem 0;
+
+    ion-tab-button {
+      padding: 0.4rem 0.25rem;
+      min-width: auto;
+      flex: 1 1 auto;
+
+      .tab-icon,
+      .tab-icon-selected {
+        font-size: 1.3rem;
+      }
+
+      .tab-label,
+      ion-label {
+        font-size: 0.65rem;
+        white-space: nowrap;
+        overflow: visible;
+        text-overflow: clip;
+        max-width: none;
+        width: auto;
+      }
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .custom-tab-bar {
+    background: linear-gradient(180deg, #1F2937 0%, #111827 100%);
+    border-top-color: rgba(16, 185, 129, 0.2);
+
+    ion-tab-button {
+      --color: #{$text-light};
+      --color-selected: #{$primary-color};
+
+      .tab-icon {
+        color: $text-light;
+      }
+
+      .tab-label,
+      ion-label {
+        color: $text-light;
+      }
+    }
+  }
+}
+
+.custom-tab-bar {
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.custom-tab-button {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  &:active::before {
+    width: 200px;
+    height: 200px;
+    animation: ripple 0.6s ease-out;
+  }
+}

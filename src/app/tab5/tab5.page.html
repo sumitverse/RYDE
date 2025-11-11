@@ -1,0 +1,154 @@
+<ion-header [translucent]="true" class="profile-header">
+  <ion-toolbar color="transparent" class="header-toolbar">
+    <ion-title class="header-title">Profile</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="profile-content">
+  
+  <div class="profile-header-section">
+    <div class="profile-background"></div>
+    <div class="profile-content-wrapper">
+      <div class="profile-avatar-container">
+        <ion-avatar class="profile-avatar">
+          <img [src]="userAvatar" [alt]="userName" />
+        </ion-avatar>
+        <ion-button fill="clear" class="edit-button" (click)="selectPhoto()">
+          <ion-icon name="camera-outline"></ion-icon>
+        </ion-button>
+        <input type="file" #fileInput accept="image/*" style="display: none;" (change)="onPhotoSelected($event)">
+      </div>
+      <h2 class="user-name">{{ loggedInUserName || userName }}</h2>
+      <p class="user-email">{{ userEmail }}</p>
+      <div class="member-info">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        <span>Member since {{ memberSince }}</span>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="stats-section">
+    <ion-card class="stat-card stat-primary">
+      <ion-card-content>
+        <div class="stat-item">
+          <div class="stat-icon-wrapper">
+            <ion-icon name="bicycle-outline" class="stat-icon"></ion-icon>
+          </div>
+          <div class="stat-details">
+            <h3>{{ totalRides }}</h3>
+            <p>Total Rides</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="stat-card stat-success">
+      <ion-card-content>
+        <div class="stat-item">
+          <div class="stat-icon-wrapper">
+            <ion-icon name="speedometer-outline" class="stat-icon"></ion-icon>
+          </div>
+          <div class="stat-details">
+            <h3>{{ totalDistance.toFixed(2) }}km</h3>
+            <p>Distance</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="stat-card stat-warning">
+      <ion-card-content>
+        <div class="stat-item">
+          <div class="stat-icon-wrapper">
+            <ion-icon name="wallet-outline" class="stat-icon"></ion-icon>
+          </div>
+          <div class="stat-details">
+            <h3>₹{{ totalSaved.toFixed(2) }}</h3>
+            <p>Saved</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="stat-card stat-info">
+      <ion-card-content>
+        <div class="stat-item">
+          <div class="stat-icon-wrapper">
+            <ion-icon name="trophy-outline" class="stat-icon"></ion-icon>
+          </div>
+          <div class="stat-details">
+            <h3>{{ carbonSaved.toFixed(2) }}kg</h3>
+            <p>CO₂ Saved</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  
+  <div class="achievements-section">
+    <div class="section-header">
+      <h3 class="section-title">
+        <ion-icon name="trophy-outline"></ion-icon>
+        Achievements
+      </h3>
+    </div>
+    <div class="achievements-grid">
+      <div 
+        *ngFor="let achievement of achievements" 
+        class="achievement-card"
+        [class.unlocked]="achievement.unlocked">
+        <div class="achievement-icon">
+          <ion-icon [name]="achievement.icon"></ion-icon>
+        </div>
+        <div class="achievement-content">
+          <h4>{{ achievement.title }}</h4>
+          <p>{{ achievement.description }}</p>
+        </div>
+        <div class="achievement-badge" *ngIf="achievement.unlocked">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="menu-section">
+    <ion-list>
+      <ion-list-header>
+        <ion-label>Menu</ion-label>
+      </ion-list-header>
+      <ion-item 
+        *ngFor="let item of menuItems" 
+        button 
+        (click)="navigateTo(item.route)"
+        class="menu-item"
+        lines="none">
+        <div class="menu-item-content">
+          <div class="menu-icon-wrapper">
+            <ion-icon [name]="item.icon" class="menu-icon"></ion-icon>
+            <ion-badge *ngIf="item.badge" color="danger" class="menu-badge">
+              {{ item.badge }}
+            </ion-badge>
+          </div>
+          <ion-label class="menu-label">{{ item.label }}</ion-label>
+        </div>
+        <ion-icon name="chevron-forward-outline" slot="end" class="chevron-icon"></ion-icon>
+      </ion-item>
+    </ion-list>
+  </div>
+
+  
+  <div class="logout-section">
+    <ion-button expand="block" fill="outline" color="danger" (click)="logout()" class="logout-button">
+      <ion-icon name="log-out-outline" slot="start"></ion-icon>
+      Logout
+    </ion-button>
+  </div>
+
+  
+  <div class="footer-section">
+    <p class="footer-text">Made with <span class="heart-icon">❤️</span> by sumitverse</p>
+  </div>
+</ion-content>

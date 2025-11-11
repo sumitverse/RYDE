@@ -1,0 +1,455 @@
+$primary-color: #10B981;
+$accent-color: #059669;
+$secondary-color: #34D399;
+$background-color: #FFFFFF;
+$card-background: #FFFFFF;
+$text-primary: #1F2937;
+$text-secondary: #4B5563;
+$text-light: #6B7280;
+$success-color: #10B981;
+$border-color: #E5E7EB;
+$card-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+$card-shadow-hover: 0 8px 24px rgba(16, 185, 129, 0.15);
+$gradient-primary: linear-gradient(135deg, #10B981 0%, #059669 100%);
+$gradient-accent: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+
+$font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.totalrides-header {
+  .header-toolbar {
+    --background: #{$background-color};
+    --color: $text-primary;
+    min-height: 56px;
+    border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    ion-title {
+      color: $text-primary;
+      font-weight: 700;
+      font-size: 1.5rem;
+      text-align: center;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      letter-spacing: -0.5px;
+      background: $gradient-primary;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: auto;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    ion-buttons {
+      position: absolute;
+      left: 0;
+      z-index: 10;
+    }
+
+    ion-back-button {
+      --color: $primary-color;
+      --icon-font-size: 1.5rem;
+    }
+  }
+}
+
+.totalrides-content {
+  --background: #{$background-color};
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  font-family: $font-family;
+}
+
+.stats-hero {
+  background: $gradient-primary;
+  padding: 2rem 1.5rem;
+  color: white;
+  margin-bottom: 0;
+  margin-top: 0;
+  position: relative;
+  z-index: 1;
+
+  .hero-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+
+    .hero-icon {
+      font-size: 3.5rem;
+      opacity: 0.9;
+    }
+
+    .hero-stats {
+      flex: 1;
+
+      .hero-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 0.5rem;
+
+        .unit {
+          font-size: 1.2rem;
+          font-weight: 400;
+          margin-left: 0.25rem;
+          opacity: 0.9;
+        }
+      }
+
+      .hero-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-bottom: 0.5rem;
+      }
+
+      .hero-subtitle {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+
+        ion-icon {
+          font-size: 1rem;
+        }
+
+        .trend-up {
+          color: #4ade80;
+        }
+
+        .trend-label {
+          opacity: 0.8;
+          margin-left: 0.25rem;
+        }
+      }
+    }
+  }
+}
+
+.filter-selector {
+  padding: 1rem 1.5rem;
+  background: $background-color;
+  border-bottom: 1px solid $border-color;
+  margin-bottom: 1rem;
+
+  ion-segment {
+    --background: #F3F4F6;
+    --indicator-color: $primary-color;
+    border-radius: 12px;
+    padding: 4px;
+    height: 48px;
+
+    ion-segment-button {
+      --indicator-color: transparent;
+      --color: $text-secondary;
+      --color-checked: $primary-color;
+      --background-checked: white;
+      --background-hover: rgba(16, 185, 129, 0.1);
+      border-radius: 8px;
+      min-height: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+
+      &::part(indicator) {
+        display: none;
+      }
+
+      &.segment-button-checked {
+        background: white;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+        color: $primary-color;
+      }
+    }
+  }
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  padding: 0 1rem;
+  margin-bottom: 1rem;
+
+  .summary-card {
+    margin: 0;
+    border-radius: 16px;
+    box-shadow: $card-shadow;
+
+    ion-card-content {
+      padding: 1rem;
+      text-align: center;
+
+      .summary-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 0.75rem;
+        font-size: 1.25rem;
+
+        &.distance {
+          background: $gradient-primary;
+          color: white;
+        }
+
+        &.time {
+          background: $gradient-accent;
+          color: white;
+        }
+
+        &.fare {
+          background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+          color: white;
+        }
+      }
+
+      .summary-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: $text-primary;
+        margin-bottom: 0.25rem;
+
+        .unit-small {
+          font-size: 0.75rem;
+          font-weight: 500;
+          color: $text-secondary;
+          margin-left: 0.25rem;
+        }
+      }
+
+      .summary-label {
+        font-size: 0.7rem;
+        color: $text-secondary;
+      }
+    }
+  }
+}
+
+.rides-section {
+  padding: 0 1rem 1rem;
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: $text-primary;
+      margin: 0;
+
+      ion-icon {
+        font-size: 1.25rem;
+        color: $primary-color;
+      }
+    }
+
+    .ride-count {
+      font-size: 0.85rem;
+      color: $text-secondary;
+      font-weight: 500;
+    }
+  }
+
+  .empty-card {
+    margin: 0;
+    border-radius: 16px;
+    box-shadow: $card-shadow;
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+      text-align: center;
+
+      ion-icon {
+        font-size: 4rem;
+        color: $text-light;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+      }
+
+      p {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: $text-primary;
+        margin: 0 0 0.5rem;
+      }
+
+      .empty-subtitle {
+        font-size: 0.85rem;
+        color: $text-secondary;
+      }
+    }
+  }
+
+  .rides-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .ride-card {
+      margin: 0;
+      border-radius: 16px;
+      box-shadow: $card-shadow;
+      animation: fadeIn 0.5s ease both;
+      border-left: 4px solid $primary-color;
+      transition: all 0.3s ease;
+
+      &:hover {
+        box-shadow: $card-shadow-hover;
+        transform: translateY(-2px);
+      }
+
+      ion-card-content {
+        padding: 1.25rem;
+
+        .ride-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1rem;
+          padding-bottom: 0.75rem;
+          border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+
+          .ride-date-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: $text-secondary;
+            font-size: 0.9rem;
+            font-weight: 500;
+
+            ion-icon {
+              font-size: 1rem;
+              color: $primary-color;
+            }
+          }
+        }
+
+        .ride-main {
+          .ride-cycle {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+
+            .cycle-icon {
+              width: 50px;
+              height: 50px;
+              background: $gradient-primary;
+              border-radius: 12px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 1.5rem;
+              color: white;
+              box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            }
+
+            .cycle-info {
+              flex: 1;
+
+              .cycle-name {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: $text-primary;
+                margin-bottom: 0.25rem;
+              }
+
+              .cycle-id {
+                font-size: 0.8rem;
+                color: $text-secondary;
+              }
+            }
+          }
+
+          .ride-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+
+            .ride-stat-item {
+              display: flex;
+              align-items: center;
+              gap: 0.75rem;
+              padding: 0.75rem;
+              background: #f8fafc;
+              border-radius: 12px;
+
+              ion-icon {
+                font-size: 1.25rem;
+                color: $primary-color;
+              }
+
+              .stat-info {
+                flex: 1;
+
+                .stat-value {
+                  font-size: 1rem;
+                  font-weight: 700;
+                  color: $text-primary;
+                  margin-bottom: 0.15rem;
+
+                  .unit-tiny {
+                    font-size: 0.7rem;
+                    font-weight: 500;
+                    color: $text-secondary;
+                    margin-left: 0.15rem;
+                  }
+                }
+
+                .stat-label {
+                  font-size: 0.7rem;
+                  color: $text-secondary;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ride-stats {
+    grid-template-columns: 1fr !important;
+  }
+}

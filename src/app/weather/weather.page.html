@@ -1,0 +1,117 @@
+<ion-header [translucent]="true" class="weather-header">
+  <ion-toolbar color="transparent" class="header-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/tab1"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="header-title">Weather</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="weather-content">
+  
+  <div class="search-section">
+    <ion-searchbar
+      [(ngModel)]="searchQuery"
+      (ionInput)="onSearchChange($event)"
+      (keyup.enter)="searchLocation()"
+      placeholder="Search location..."
+      class="weather-searchbar">
+    </ion-searchbar>
+    <ion-button 
+      expand="block" 
+      color="primary" 
+      (click)="searchLocation()"
+      [disabled]="isLoading || !searchQuery.trim()"
+      class="search-btn">
+      <ion-icon name="search-outline" slot="start"></ion-icon>
+      Search
+      <ion-spinner *ngIf="isLoading" name="crescent" class="spinner"></ion-spinner>
+    </ion-button>
+  </div>
+
+  
+  <div *ngIf="selectedLocation" class="selected-weather-section">
+    <ion-card class="weather-card main-weather">
+      <ion-card-content>
+        <div class="weather-header-info">
+          <div class="location-info">
+            <ion-icon name="location-outline" class="location-icon"></ion-icon>
+            <h2 class="location-name">{{ selectedLocation.name }}</h2>
+            <ion-chip *ngIf="savedLocation?.name === selectedLocation.name" color="success" size="small" class="saved-chip">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              Saved
+            </ion-chip>
+          </div>
+          <div class="weather-icon-large">
+            <ion-icon [name]="selectedLocation.icon" [color]="getConditionColor(selectedLocation.condition)"></ion-icon>
+          </div>
+        </div>
+        
+        <div class="weather-main">
+          <div class="temperature">
+            <span class="temp-value">{{ selectedLocation.temp }}</span>
+            <span class="temp-unit">°C</span>
+          </div>
+          <div class="condition-text">{{ selectedLocation.condition | titlecase }}</div>
+        </div>
+
+        <div class="weather-details" *ngIf="selectedLocation.humidity && selectedLocation.windSpeed">
+          <div class="detail-item">
+            <ion-icon name="water-outline"></ion-icon>
+            <span>Humidity: {{ selectedLocation.humidity }}%</span>
+          </div>
+          <div class="detail-item">
+            <ion-icon name="speedometer-outline"></ion-icon>
+            <span>Wind: {{ selectedLocation.windSpeed }} km/h</span>
+          </div>
+        </div>
+
+        <ion-button 
+          expand="block" 
+          color="primary" 
+          (click)="saveLocation()"
+          class="save-btn">
+          <ion-icon name="pin-outline" slot="start"></ion-icon>
+          Set as Default Location
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  
+  <div class="popular-locations-section">
+    <div class="section-header">
+      <h3 class="section-title">
+        <ion-icon name="location-outline"></ion-icon>
+        Popular Locations
+      </h3>
+    </div>
+
+    <div class="locations-grid">
+      <ion-card 
+        *ngFor="let location of getFilteredLocations()" 
+        class="location-card"
+        [class.selected]="selectedLocation?.name === location.name"
+        (click)="selectLocation(location)">
+        <ion-card-content>
+          <div class="location-card-header">
+            <div class="location-name-small">{{ location.name }}</div>
+            <ion-icon 
+              [name]="location.icon" 
+              [color]="getConditionColor(location.condition)"
+              class="location-weather-icon">
+            </ion-icon>
+          </div>
+          <div class="location-temp">{{ location.temp }}°C</div>
+          <div class="location-condition">{{ location.condition | titlecase }}</div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+
+  
+  <div *ngIf="!selectedLocation && !isLoading" class="empty-state">
+    <ion-icon name="cloud-outline" class="empty-icon"></ion-icon>
+    <p>Search for a location or select from popular locations</p>
+  </div>
+</ion-content>

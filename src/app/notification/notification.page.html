@@ -1,0 +1,64 @@
+<ion-header [translucent]="true" class="notification-header">
+  <ion-toolbar color="transparent" class="header-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/tab1" text="" icon="chevron-back-outline"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="header-title">Notifications</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="markAllAsRead()" *ngIf="unreadCount > 0" class="action-btn">
+        <ion-icon name="checkmark-done-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="notification-content">
+  
+  <div *ngIf="unreadCount > 0" class="unread-badge">
+    <ion-badge color="danger" class="unread-count">{{ unreadCount }} unread</ion-badge>
+  </div>
+
+  
+  <div *ngIf="notifications.length === 0" class="empty-state">
+    <ion-icon name="notifications-outline" class="empty-icon"></ion-icon>
+    <h3>No Notifications</h3>
+    <p>You're all caught up! Check back later for updates.</p>
+  </div>
+
+  
+  <div *ngIf="notifications.length > 0" class="notifications-list">
+    <div 
+      *ngFor="let notification of notifications; let i = index" 
+      class="notification-item"
+      [class.unread]="!notification.isRead"
+      [class.read]="notification.isRead"
+      [style.animation-delay]="i * 0.1 + 's'"
+      (click)="onNotificationClick(notification)">
+      
+      <div class="notification-content-wrapper">
+        <div class="notification-icon-wrapper" [attr.color]="notification.color">
+          <ion-icon [name]="notification.icon" class="notification-icon"></ion-icon>
+        </div>
+        
+        <div class="notification-details">
+          <div class="notification-header-row">
+            <h4 class="notification-title">{{ notification.title }}</h4>
+          </div>
+          <p class="notification-message">{{ notification.message }}</p>
+          <div class="notification-footer">
+            <span class="notification-time">
+              <ion-icon name="time-outline"></ion-icon>
+              {{ notification.time }}
+            </span>
+            <span *ngIf="notification.action" class="notification-action">
+              {{ notification.action }}
+              <ion-icon name="chevron-forward-outline"></ion-icon>
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="!notification.isRead" class="unread-indicator"></div>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,195 @@
+<ion-header [translucent]="true" class="stats-header">
+  <ion-toolbar color="transparent" class="header-toolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" class="back-btn">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="header-title">Statistics</ion-title>
+    <ion-buttons slot="end">
+      <ion-icon name="stats-chart-outline" class="header-icon"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="stats-content">
+  
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Loading statistics...</p>
+  </div>
+
+  
+  <div *ngIf="!isLoading" class="content-wrapper">
+    
+    <div class="period-selector fade-in">
+      <ion-segment [(ngModel)]="selectedPeriod" (ionChange)="onPeriodChange($event)" class="period-segment">
+        <ion-segment-button value="week">
+          <ion-label>Week</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="month">
+          <ion-label>Month</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="all">
+          <ion-label>All Time</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
+
+    
+    <div class="hero-section fade-in">
+      <ion-card class="hero-card">
+        <ion-card-content>
+          <div class="hero-content">
+            <div class="hero-icon-container">
+              <div class="hero-icon">
+                <ion-icon name="trophy-outline"></ion-icon>
+              </div>
+            </div>
+            <div class="hero-stats">
+              <div class="hero-main-stat">
+                <span class="hero-value">{{ totalRides }}</span>
+                <span class="hero-label">Total Rides</span>
+              </div>
+              <div class="hero-secondary-stats">
+                <div class="hero-stat-item">
+                  <ion-icon name="speedometer-outline"></ion-icon>
+                  <span>{{ totalDistance.toFixed(1) }} km</span>
+                </div>
+                <div class="hero-stat-item">
+                  <ion-icon name="leaf-outline"></ion-icon>
+                  <span>{{ carbonSaved.toFixed(1) }} kg CO₂</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    
+    <div class="stats-grid fade-in">
+      <div *ngFor="let stat of statCards; let i = index" class="stat-card-wrapper" [style.animation-delay]="i * 0.1 + 's'">
+        <ion-card class="stat-card" [class]="'stat-card-' + stat.color">
+          <ion-card-content>
+            <div class="stat-header">
+              <div class="stat-icon-container" [class]="'icon-' + stat.color">
+                <ion-icon [name]="stat.icon"></ion-icon>
+              </div>
+              <div class="stat-trend" *ngIf="stat.trend">
+                <ion-icon [name]="stat.trend === 'up' ? 'trending-up-outline' : 'trending-down-outline'"></ion-icon>
+                <span [class]="'trend-' + stat.trend">{{ stat.trendValue }}</span>
+              </div>
+            </div>
+            <div class="stat-body">
+              <div class="stat-value">{{ stat.value }}</div>
+              <div class="stat-title">{{ stat.title }}</div>
+            </div>
+            <div class="stat-progress" *ngIf="stat.progress !== undefined">
+              <ion-progress-bar [value]="stat.progress / 100" [color]="stat.color" class="progress-bar"></ion-progress-bar>
+              <div class="progress-text">{{ stat.progress.toFixed(0) }}%</div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    
+    <div class="achievements-section fade-in">
+      <div class="section-header">
+        <h3 class="section-title">
+          <ion-icon name="medal-outline"></ion-icon>
+          Achievements
+        </h3>
+        <ion-badge color="primary" class="achievement-badge">
+          {{ getUnlockedAchievementsCount() }}/{{ achievements.length }}
+        </ion-badge>
+      </div>
+      
+      <div class="achievements-grid">
+        <div *ngFor="let achievement of achievements; let i = index" 
+             class="achievement-card fade-in"
+             [class.unlocked]="achievement.unlocked"
+             [style.animation-delay]="i * 0.1 + 's'">
+          <ion-card class="achievement-item">
+            <ion-card-content>
+              <div class="achievement-icon-container" [class.unlocked]="achievement.unlocked">
+                <ion-icon [name]="achievement.icon"></ion-icon>
+                <div class="achievement-check" *ngIf="achievement.unlocked">
+                  <ion-icon name="checkmark-circle-outline"></ion-icon>
+                </div>
+              </div>
+              <div class="achievement-content">
+                <h4 class="achievement-title">{{ achievement.title }}</h4>
+                <p class="achievement-description">{{ achievement.description }}</p>
+                <div class="achievement-progress">
+                  <ion-progress-bar 
+                    [value]="achievement.progress / 100" 
+                    [color]="achievement.unlocked ? 'success' : 'primary'"
+                    class="achievement-progress-bar">
+                  </ion-progress-bar>
+                  <div class="progress-info">
+                    <span>{{ achievement.progress.toFixed(0) }}%</span>
+                    <span>{{ achievement.target }}</span>
+                  </div>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="summary-section fade-in">
+      <ion-card class="summary-card">
+        <ion-card-header>
+          <ion-card-title class="summary-title">
+            <ion-icon name="stats-chart-outline"></ion-icon>
+            Performance Summary
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <div class="summary-icon avg-distance">
+                <ion-icon name="speedometer-outline"></ion-icon>
+              </div>
+              <div class="summary-content">
+                <div class="summary-value">{{ averageDistance.toFixed(1) }} km</div>
+                <div class="summary-label">Avg Distance/Ride</div>
+              </div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon avg-speed">
+                <ion-icon name="flash-outline"></ion-icon>
+              </div>
+              <div class="summary-content">
+                <div class="summary-value">{{ averageSpeed.toFixed(1) }} km/h</div>
+                <div class="summary-label">Avg Speed</div>
+              </div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon total-time">
+                <ion-icon name="time-outline"></ion-icon>
+              </div>
+              <div class="summary-content">
+                <div class="summary-value">{{ Math.floor(totalTime / 60) }}h {{ totalTime % 60 }}m</div>
+                <div class="summary-label">Total Time</div>
+              </div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon money-saved">
+                <ion-icon name="wallet-outline"></ion-icon>
+              </div>
+              <div class="summary-content">
+                <div class="summary-value">₹{{ totalSaved.toFixed(2) }}</div>
+                <div class="summary-label">Total Saved</div>
+              </div>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

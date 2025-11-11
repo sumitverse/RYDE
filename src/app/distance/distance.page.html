@@ -1,0 +1,238 @@
+<ion-header class="distance-header">
+  <ion-toolbar class="header-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/tab1"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Distance</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="false" class="distance-content">
+  
+  <div class="stats-hero">
+    <div class="hero-content">
+      <div class="hero-icon">
+        <ion-icon name="speedometer-outline"></ion-icon>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-value">{{ currentStats.totalDistance.toFixed(2) }}<span class="unit">km</span></div>
+        <div class="hero-label">Total Distance</div>
+        <div class="hero-subtitle">
+          <ion-icon [name]="trendDirection === 'up' ? 'trending-up-outline' : 'trending-down-outline'"></ion-icon>
+          <span [class]="'trend-' + trendDirection">{{ Math.abs(trendPercentage).toFixed(1) }}%</span>
+          <span class="trend-label">vs last period</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="period-selector">
+    <ion-segment [(ngModel)]="selectedPeriod" (ionChange)="onPeriodChange($event)" value="all">
+      <ion-segment-button value="today">
+        <ion-label>Today</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="week">
+        <ion-label>Week</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="month">
+        <ion-label>Month</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="all">
+        <ion-label>All Time</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+  
+  <div class="metrics-grid">
+    <ion-card class="metric-card">
+      <ion-card-content>
+        <div class="metric-icon rides">
+          <ion-icon name="bicycle-outline"></ion-icon>
+        </div>
+        <div class="metric-value">{{ currentStats.totalRides }}</div>
+        <div class="metric-label">Total Rides</div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="metric-card">
+      <ion-card-content>
+        <div class="metric-icon average">
+          <ion-icon name="pulse-outline"></ion-icon>
+        </div>
+        <div class="metric-value">{{ currentStats.averageDistance.toFixed(2) }}<span class="unit-small">km</span></div>
+        <div class="metric-label">Avg per Ride</div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="metric-card">
+      <ion-card-content>
+        <div class="metric-icon speed">
+          <ion-icon name="flame-outline"></ion-icon>
+        </div>
+        <div class="metric-value">{{ currentStats.averageSpeed.toFixed(1) }}<span class="unit-small">km/h</span></div>
+        <div class="metric-label">Avg Speed</div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="metric-card">
+      <ion-card-content>
+        <div class="metric-icon time">
+          <ion-icon name="time-outline"></ion-icon>
+        </div>
+        <div class="metric-value">{{ Math.floor(currentStats.totalDuration / 60) }}<span class="unit-small">h</span></div>
+        <div class="metric-label">Total Time</div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  
+  <div class="impact-section">
+    <ion-card class="impact-card carbon">
+      <ion-card-content>
+        <div class="impact-header">
+          <ion-icon name="location-outline"></ion-icon>
+          <div class="impact-info">
+            <div class="impact-value">{{ currentStats.carbonSaved.toFixed(2) }}<span class="unit-small">kg</span></div>
+            <div class="impact-label">CO₂ Saved</div>
+          </div>
+        </div>
+        <div class="impact-description">Equivalent to planting {{ Math.ceil(currentStats.carbonSaved / 5) }} trees</div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="impact-card money">
+      <ion-card-content>
+        <div class="impact-header">
+          <ion-icon name="trophy-outline"></ion-icon>
+          <div class="impact-info">
+            <div class="impact-value">₹{{ currentStats.moneySaved.toFixed(2) }}</div>
+            <div class="impact-label">Money Saved</div>
+          </div>
+        </div>
+        <div class="impact-description">Compared to other transport modes</div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  
+  <ion-card *ngIf="selectedPeriod === 'week' || selectedPeriod === 'all'" class="chart-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="stats-chart-outline"></ion-icon>
+        Weekly Breakdown
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="chart-container">
+        <div class="chart-bars">
+          <div *ngFor="let day of weeklyBreakdown" class="chart-bar-item">
+            <div class="bar-wrapper">
+              <div 
+                class="bar" 
+                [style.height.%]="(day.distance / getMaxDistance()) * 100"
+                [class.has-rides]="day.rides > 0">
+              </div>
+            </div>
+            <div class="bar-label">{{ day.day }}</div>
+            <div class="bar-value">{{ day.distance.toFixed(2) }}km</div>
+            <div class="bar-rides" *ngIf="day.rides > 0">{{ day.rides }} ride{{ day.rides > 1 ? 's' : '' }}</div>
+          </div>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  
+  <ion-card *ngIf="selectedPeriod === 'month' || selectedPeriod === 'all'" class="chart-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="calendar-outline"></ion-icon>
+        Monthly Breakdown
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="chart-container">
+        <div class="chart-bars horizontal">
+          <div *ngFor="let month of monthlyBreakdown" class="chart-bar-item horizontal">
+            <div class="bar-label">{{ month.month }}</div>
+            <div class="bar-wrapper horizontal">
+              <div 
+                class="bar horizontal" 
+                [style.width.%]="(month.distance / getMaxDistance()) * 100"
+                [class.has-rides]="month.rides > 0">
+              </div>
+            </div>
+            <div class="bar-info">
+              <div class="bar-value">{{ month.distance.toFixed(2) }}km</div>
+              <div class="bar-rides" *ngIf="month.rides > 0">{{ month.rides }} ride{{ month.rides > 1 ? 's' : '' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  
+  <ion-card class="milestones-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="trophy-outline"></ion-icon>
+        Distance Milestones
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="milestones-list">
+        <div *ngFor="let milestone of milestones" class="milestone-item">
+          <div class="milestone-header">
+            <div class="milestone-label">{{ milestone.label }}</div>
+            <div class="milestone-progress">
+              {{ milestone.current.toFixed(2) }} / {{ milestone.target }} km
+            </div>
+          </div>
+          <ion-progress-bar 
+            [value]="milestone.percentage / 100" 
+            [class.completed]="milestone.percentage >= 100">
+          </ion-progress-bar>
+          <div class="milestone-badge" *ngIf="milestone.percentage >= 100">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            Achieved!
+          </div>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  
+  <ion-card class="recent-rides-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="time-outline"></ion-icon>
+        Recent Rides
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="rides-list">
+        <div *ngFor="let ride of recentRides.slice(0, 7)" class="ride-item">
+          <div class="ride-date">
+            <ion-icon name="calendar-outline"></ion-icon>
+            {{ formatDate(ride.date) }}
+          </div>
+          <div class="ride-details">
+            <div class="ride-distance">
+              <ion-icon name="speedometer-outline"></ion-icon>
+              {{ ride.distance.toFixed(2) }} km
+            </div>
+            <div class="ride-meta">
+              <ion-chip *ngIf="ride.rides > 1" color="primary" size="small">
+                {{ ride.rides }} rides
+              </ion-chip>
+              <span class="ride-duration">{{ ride.duration }} min</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

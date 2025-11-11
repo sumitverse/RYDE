@@ -1,0 +1,147 @@
+<ion-header class="totalrides-header">
+  <ion-toolbar class="header-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/tab1"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Total Rides</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="false" class="totalrides-content">
+  
+  <div class="stats-hero">
+    <div class="hero-content">
+      <div class="hero-icon">
+        <ion-icon name="bicycle-outline"></ion-icon>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-value">{{ totalRides }}<span class="unit">rides</span></div>
+        <div class="hero-label">{{ selectedFilter === 'today' ? 'Today\'s Rides' : 'All Rides' }}</div>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="filter-selector">
+    <ion-segment [(ngModel)]="selectedFilter" (ionChange)="onFilterChange($event)" value="all">
+      <ion-segment-button value="today">
+        <ion-label>Today</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="all">
+        <ion-label>All Rides</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+  
+  <div class="summary-grid">
+    <ion-card class="summary-card">
+      <ion-card-content>
+        <div class="summary-icon distance">
+          <ion-icon name="speedometer-outline"></ion-icon>
+        </div>
+        <div class="summary-value">{{ getTotalDistance().toFixed(1) }}<span class="unit-small">km</span></div>
+        <div class="summary-label">Total Distance</div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="summary-card">
+      <ion-card-content>
+        <div class="summary-icon time">
+          <ion-icon name="time-outline"></ion-icon>
+        </div>
+        <div class="summary-value">{{ Math.floor(getTotalDuration() / 60) }}<span class="unit-small">h</span></div>
+        <div class="summary-label">Total Time</div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="summary-card">
+      <ion-card-content>
+        <div class="summary-icon fare">
+          <ion-icon name="flash-outline"></ion-icon>
+        </div>
+        <div class="summary-value">₹{{ getTotalFare().toFixed(2) }}</div>
+        <div class="summary-label">Total Spent</div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  
+  <div class="rides-section">
+    <div class="section-header">
+      <h3 class="section-title">
+        <ion-icon name="bicycle-outline"></ion-icon>
+        Ride History
+      </h3>
+      <span class="ride-count">{{ filteredRides.length }} ride{{ filteredRides.length !== 1 ? 's' : '' }}</span>
+    </div>
+
+    <ion-card *ngIf="filteredRides.length === 0" class="empty-card">
+      <ion-card-content>
+        <div class="empty-state">
+          <ion-icon name="bicycle-outline"></ion-icon>
+          <p>No rides found</p>
+          <span class="empty-subtitle">Start your first ride to see it here!</span>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <div *ngIf="filteredRides.length > 0" class="rides-list">
+      <ion-card 
+        *ngFor="let ride of filteredRides; let i = index" 
+        class="ride-card"
+        [style.animation-delay]="i * 0.05 + 's'">
+        <ion-card-content>
+          <div class="ride-header">
+            <div class="ride-date-section">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <span class="ride-date">{{ formatDate(ride.date) }}</span>
+            </div>
+            <ion-chip color="success" size="small" *ngIf="ride.status === 'completed'">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              Completed
+            </ion-chip>
+          </div>
+
+          <div class="ride-main">
+            <div class="ride-cycle">
+              <div class="cycle-icon">
+                <ion-icon name="bicycle-outline"></ion-icon>
+              </div>
+              <div class="cycle-info">
+                <div class="cycle-name">{{ ride.cycleName }}</div>
+                <div class="cycle-id">Ride #{{ ride.id.split('-')[0] }}</div>
+              </div>
+            </div>
+
+            <div class="ride-stats">
+              <div class="ride-stat-item">
+                <ion-icon name="speedometer-outline"></ion-icon>
+                <div class="stat-info">
+                  <div class="stat-value">{{ ride.distance.toFixed(1) }}<span class="unit-tiny">km</span></div>
+                  <div class="stat-label">Distance</div>
+                </div>
+              </div>
+
+              <div class="ride-stat-item">
+                <ion-icon name="time-outline"></ion-icon>
+                <div class="stat-info">
+                  <div class="stat-value">{{ formatDuration(ride.duration) }}</div>
+                  <div class="stat-label">Duration</div>
+                </div>
+              </div>
+
+              <div class="ride-stat-item">
+                <ion-icon name="flash-outline"></ion-icon>
+                <div class="stat-info">
+                  <div class="stat-value">₹{{ ride.fare.toFixed(2) }}</div>
+                  <div class="stat-label">Fare</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

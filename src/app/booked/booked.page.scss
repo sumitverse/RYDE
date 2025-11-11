@@ -1,0 +1,540 @@
+$primary-color: #10B981;
+$accent-color: #059669;
+$secondary-color: #34D399;
+$background-color: #FFFFFF;
+$card-background: #FFFFFF;
+$text-primary: #1F2937;
+$text-secondary: #4B5563;
+$text-light: #6B7280;
+$success-color: #10B981;
+$border-color: #E5E7EB;
+$card-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+$card-shadow-hover: 0 8px 24px rgba(16, 185, 129, 0.15);
+$gradient-primary: linear-gradient(135deg, #10B981 0%, #059669 100%);
+$gradient-accent: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+$font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+.booked-content {
+  --background: linear-gradient(to bottom, #F0FDF4 0%, #FFFFFF 100%);
+  font-family: $font-family;
+  position: relative;
+  overflow: hidden;
+}
+
+.booked-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.success-icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+  opacity: 0;
+  transform: scale(0);
+  animation: successIconPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.2s forwards;
+
+  .success-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: $gradient-primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
+    position: relative;
+    animation: successPulse 2s ease-in-out infinite 0.8s;
+
+    &::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.2);
+      animation: ripple 2s ease-out infinite;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.1);
+      animation: ripple 2s ease-out 0.5s infinite;
+    }
+
+    ion-icon {
+      font-size: 64px;
+      color: white;
+      z-index: 1;
+      animation: checkmarkDraw 0.5s ease-out 0.4s both;
+    }
+  }
+}
+
+@keyframes successIconPop {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-180deg);
+  }
+  60% {
+    transform: scale(1.1) rotate(10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes successPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 15px 50px rgba(16, 185, 129, 0.4);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+@keyframes checkmarkDraw {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-45deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.congratulations-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: $text-primary;
+  text-align: center;
+  margin: 0 0 0.5rem 0;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s ease-out 0.5s forwards;
+  font-family: $font-family;
+}
+
+.booking-confirmed-text {
+  font-size: 18px;
+  color: $text-secondary;
+  text-align: center;
+  margin: 0 0 2.5rem 0;
+  font-weight: 500;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s ease-out 0.7s forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cycle-card-container {
+  width: 100%;
+  max-width: 400px;
+  opacity: 0;
+  transform: translateY(30px) scale(0.95);
+  animation: cardSlideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.9s forwards;
+}
+
+@keyframes cardSlideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.cycle-card {
+  background: $card-background;
+  border-radius: 24px;
+  box-shadow: $card-shadow;
+  border: none;
+  overflow: hidden;
+  background: linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: $gradient-primary;
+    transform: scaleX(0);
+    animation: progressLine 1s ease-out 1.2s forwards;
+  }
+}
+
+@keyframes progressLine {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.cycle-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(135deg, #F0FDF4 0%, #FFFFFF 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  .cycle-image {
+    width: 85%;
+    height: 85%;
+    object-fit: contain;
+    animation: cycleImageFloat 3s ease-in-out infinite;
+    filter: drop-shadow(0 10px 20px rgba(16, 185, 129, 0.2));
+  }
+}
+
+@keyframes cycleImageFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.02);
+  }
+}
+
+.cycle-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: white;
+  padding: 8px 14px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 2;
+  animation: badgePop 0.5s ease-out 1.4s both;
+
+  ion-icon {
+    font-size: 18px;
+    color: $success-color;
+  }
+
+  span {
+    color: $text-primary;
+  }
+}
+
+@keyframes badgePop {
+  from {
+    opacity: 0;
+    transform: scale(0) rotate(-180deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.cycle-status-badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+  animation: badgePop 0.5s ease-out 1.5s both;
+}
+
+.cycle-info {
+  padding: 1.5rem;
+
+  .cycle-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0 0 1rem 0;
+    text-align: center;
+    font-family: $font-family;
+    animation: textFadeIn 0.6s ease-out 1.3s both;
+  }
+
+  .cycle-price-section {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%);
+    border-radius: 16px;
+    animation: textFadeIn 0.6s ease-out 1.4s both;
+
+    .price-label {
+      display: block;
+      font-size: 14px;
+      color: $text-secondary;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .price-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: $primary-color;
+      font-family: $font-family;
+    }
+  }
+
+  .cycle-battery-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    animation: textFadeIn 0.6s ease-out 1.5s both;
+
+    .battery-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: $gradient-primary;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      ion-icon {
+        font-size: 24px;
+        color: white;
+      }
+    }
+
+    .battery-info {
+      flex: 1;
+
+      .battery-label {
+        font-size: 12px;
+        color: $text-secondary;
+        margin-bottom: 0.25rem;
+      }
+
+      .battery-value {
+        font-size: 20px;
+        font-weight: 700;
+        color: $text-primary;
+      }
+
+      .battery-progress {
+        margin-top: 0.5rem;
+        height: 6px;
+        border-radius: 3px;
+      }
+    }
+  }
+}
+
+@keyframes textFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.action-button-wrapper {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 2rem;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s ease-out 1.6s forwards;
+}
+
+.ok-button {
+  --border-radius: 50px;
+  --background: #{$gradient-primary};
+  --color: white;
+  height: 56px;
+  font-size: 18px;
+  font-weight: 600;
+  font-family: $font-family;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  &:active::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(16, 185, 129, 0.4);
+  }
+
+  span {
+    position: relative;
+    z-index: 1;
+  }
+
+  ion-icon {
+    position: relative;
+    z-index: 1;
+    margin-left: 8px;
+    animation: iconBounce 2s ease-in-out infinite;
+  }
+}
+
+@keyframes iconBounce {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+}
+
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.confetti {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  top: -8px;
+  opacity: 0.7;
+  border-radius: 50%;
+  animation: confettiFall 4s linear infinite;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.6;
+  }
+  25% {
+    opacity: 0.8;
+    transform: translateY(25vh) translateX(20px) rotate(180deg) scale(0.9);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translateY(50vh) translateX(-15px) rotate(360deg) scale(0.8);
+  }
+  75% {
+    opacity: 0.7;
+    transform: translateY(75vh) translateX(25px) rotate(540deg) scale(0.6);
+  }
+  100% {
+    transform: translateY(110vh) translateX(-10px) rotate(720deg) scale(0.4);
+    opacity: 0;
+  }
+}
+
+.confetti:nth-child(5n+1) {
+  animation-duration: 3s;
+}
+
+.confetti:nth-child(5n+2) {
+  animation-duration: 3.5s;
+}
+
+.confetti:nth-child(5n+3) {
+  animation-duration: 4s;
+}
+
+.confetti:nth-child(5n+4) {
+  animation-duration: 2.8s;
+}
+
+.confetti:nth-child(5n+5) {
+  animation-duration: 3.8s;
+}
+
+@media (max-width: 576px) {
+  .congratulations-title {
+    font-size: 28px;
+  }
+
+  .booking-confirmed-text {
+    font-size: 16px;
+  }
+
+  .success-icon-container .success-circle {
+    width: 100px;
+    height: 100px;
+
+    ion-icon {
+      font-size: 52px;
+    }
+  }
+
+  .cycle-info .cycle-name {
+    font-size: 20px;
+  }
+
+  .cycle-info .cycle-price-section .price-value {
+    font-size: 28px;
+  }
+}

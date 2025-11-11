@@ -1,0 +1,28 @@
+<ion-header [translucent]="true">
+  <app-header
+    [userName]="userName"
+    [userAvatar]="userAvatar"
+    [notificationCount]="notificationCount">
+  </app-header>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="qr-scanner-content">
+  <div class="scanner-container">
+    
+    <div class="scanning-frame">
+      
+      <div class="corner corner-top-left"></div>
+      <div class="corner corner-top-right"></div>
+      <div class="corner corner-bottom-left"></div>
+      <div class="corner corner-bottom-right"></div>
+      
+      
+      <div class="scanning-line"></div>
+    </div>
+    
+    
+    <div class="instruction-text">
+      <p>Position QR code within the frame</p>
+    </div>
+  </div>
+</ion-content>

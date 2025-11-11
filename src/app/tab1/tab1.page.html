@@ -1,0 +1,419 @@
+<app-header
+  [userName]="loggedInUserName || userName"
+  [userAvatar]="userAvatar"
+  [notificationCount]="notificationCount">
+</app-header>
+
+
+<div *ngIf="showBookingNotification" class="booking-notification-banner slide-down">
+  <div class="notification-content-wrapper">
+    <div class="notification-icon-wrapper">
+      <ion-icon name="checkmark-circle-outline" class="notification-icon"></ion-icon>
+    </div>
+    <div class="notification-text-wrapper">
+      <div class="notification-title">Booking Confirmed</div>
+      <div class="notification-message">{{ bookingNotificationMessage }}</div>
+    </div>
+    <ion-button fill="clear" size="small" (click)="dismissBookingNotification()" class="notification-close-btn">
+      <ion-icon name="close-outline"></ion-icon>
+    </ion-button>
+  </div>
+</div>
+
+<ion-content [fullscreen]="true" class="home-content">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="cycle-loader">
+      <ion-icon name="bicycle-outline" class="cycle-icon"></ion-icon>
+    </div>
+    <p>Loading...</p>
+  </div>
+
+  
+  <div *ngIf="!isLoading" class="content-wrapper">
+
+    
+    <div class="header-section fade-in">
+      <div class="greeting-card">
+        <div class="user-info">
+          <div class="avatar-container">
+            <img [src]="userAvatar || 'https://via.placeholder.com/60'" [alt]="userName" class="user-avatar" />
+            <div class="status-indicator"></div>
+          </div>
+          <div class="greeting-text">
+            <h2 class="greeting">{{ greeting }}, {{ loggedInUserName || userName || 'User' }} 👋</h2>
+            <div class="location-info">
+              <ion-icon name="location-outline"></ion-icon>
+              <span class="location-text">{{ currentLocation }}</span>
+            </div>
+          </div>
+          <div class="weather-widget" (click)="navigateToWeather()">
+            <ion-icon [name]="weather.icon"></ion-icon>
+            <span class="weather-temp">{{ weather.temp }}°C</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="stats-section fade-in">
+      <div class="stats-grid">
+        <div class="stat-card stat-card-primary" (click)="animateTotalRides(); navigateToMyRides()">
+          <div class="stat-icon" [class.animate-icon]="isTotalRidesAnimating">
+            <ion-icon name="bicycle-outline"></ion-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{ totalRides }}</div>
+            <div class="stat-label">Total Rides</div>
+          </div>
+          <div class="stat-trend">
+            <ion-icon name="trending-up-outline"></ion-icon>
+            <span>+12%</span>
+          </div>
+        </div>
+
+        <div class="stat-card stat-card-success" (click)="animateDistance(); navigateToDistanceStats()" style="cursor: pointer;">
+          <div class="stat-icon" [class.animate-icon]="isDistanceAnimating">
+            <ion-icon name="speedometer-outline"></ion-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{ totalDistance.toFixed(2) }}km</div>
+            <div class="stat-label">Distance</div>
+          </div>
+          <div class="stat-trend">
+            <ion-icon name="trending-up-outline"></ion-icon>
+            <span>+8%</span>
+          </div>
+        </div>
+
+        <div class="stat-card stat-card-warning" (click)="showToast('View savings', 'warning')">
+          <div class="stat-icon">
+            <ion-icon name="wallet-outline"></ion-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">₹{{ totalSaved.toFixed(2) }}</div>
+            <div class="stat-label">Saved</div>
+          </div>
+          <div class="stat-trend">
+            <ion-icon name="trending-up-outline"></ion-icon>
+            <span>+5%</span>
+          </div>
+        </div>
+
+        <div class="stat-card stat-card-info" (click)="showToast('Carbon footprint saved', 'success')">
+          <div class="stat-icon">
+            <ion-icon name="trophy-outline"></ion-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{ carbonSaved.toFixed(2) }}kg</div>
+            <div class="stat-label">CO₂ Saved</div>
+          </div>
+          <div class="stat-trend">
+            <ion-icon name="trending-up-outline"></ion-icon>
+            <span>+15%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="quick-actions-section fade-in">
+      <div class="quick-actions-grid">
+        <div
+          class="quick-action-card"
+          *ngFor="let action of quickActions"
+          (click)="onQuickAction(action.label)"
+          [class.animating]="animatingAction === action.label"
+          [style.--action-color]="action.color">
+          <div class="action-icon">
+            <ion-icon [name]="action.icon"></ion-icon>
+          </div>
+          <div class="action-label">{{ action.label }}</div>
+        </div>
+      </div>
+    </div>
+
+    
+    <div *ngIf="activeRide" class="active-ride-section">
+      <ion-card class="active-ride-card">
+        <ion-card-header>
+          <ion-card-title class="ride-title">
+            <ion-icon name="bicycle-outline"></ion-icon>
+            Active Ride
+            <ion-badge color="success" class="ride-badge">LIVE</ion-badge>
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="ride-details">
+            
+            <div class="ride-info-item" *ngIf="activeRide?.cycle">
+              <strong>{{ activeRide.cycle.title || 'Unknown Cycle' }}</strong>
+            </div>
+            
+            
+            <div class="ride-stats" *ngIf="activeRide">
+              <div class="stat-item">
+                <ion-icon name="time-outline"></ion-icon>
+                <span class="stat-value">{{ formatDuration(activeRide.duration) }}</span>
+              </div>
+              <div class="stat-item">
+                <ion-icon name="flash-outline"></ion-icon>
+                <span class="stat-value">₹{{ (activeRide.fare || 0).toFixed(2) }}</span>
+              </div>
+            </div>
+            
+            
+            <div class="discount-info" *ngIf="activeRide && activeRide.discount && activeRide.discount > 0">
+              <div class="discount-badge-small">
+                <ion-icon name="ticket-outline"></ion-icon>
+                <span>{{ activeRide.discountPercent }}% OFF</span>
+              </div>
+              <div class="fare-breakdown">
+                <span class="original-fare">₹{{ (activeRide.originalFare || activeRide.fare).toFixed(2) }}</span>
+                <span class="discount-amount">-₹{{ activeRide.discount.toFixed(2) }}</span>
+                <span class="final-fare">₹{{ activeRide.fare.toFixed(2) }}</span>
+              </div>
+              <div class="coupon-applied" *ngIf="activeRide.couponTitle">
+                <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+                <span>{{ activeRide.couponTitle }} applied</span>
+              </div>
+            </div>
+            
+            
+            <ion-progress-bar
+              *ngIf="activeRide"
+              [value]="((activeRide.duration || 0) % 60) / 60"
+              color="primary"
+              class="ride-progress">
+            </ion-progress-bar>
+            
+            
+            <ion-button expand="block" color="danger" (click)="endRide()" class="end-ride-btn" *ngIf="activeRide">
+              <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+              End Ride
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    
+    <div class="search-section fade-in">
+      <ion-searchbar
+        [(ngModel)]="searchQuery"
+        (ionInput)="onSearchChange($event)"
+        placeholder="Search cycles..."
+        class="custom-searchbar"
+        show-clear-button="focus">
+      </ion-searchbar>
+
+      <div class="filter-chips">
+        <ion-chip
+          *ngFor="let filter of ['all', 'nearby', 'battery', 'price', 'favorites']"
+          [color]="selectedFilter === filter ? 'primary' : 'medium'"
+          (click)="selectedFilter = filter; filterCycles()"
+          class="filter-chip">
+          <ion-label>{{ filter | titlecase }}</ion-label>
+        </ion-chip>
+      </div>
+    </div>
+
+    
+    <div class="cycles-section fade-in">
+      <div class="section-header">
+        <h3 class="section-title">
+          <ion-icon name="bicycle-outline"></ion-icon>
+          Available Cycles
+          <ion-badge color="primary" class="count-badge">{{ filteredCycles.length }}</ion-badge>
+        </h3>
+        <ion-button fill="clear" size="small" (click)="reloadCycles()" class="refresh-btn" [disabled]="isReloading">
+          <ion-icon name="refresh-outline" [class.spinning]="showReloadAnimation"></ion-icon>
+        </ion-button>
+      </div>
+
+      
+      <div *ngIf="showNearestMessage" class="nearest-message-banner fade-in">
+        <div class="banner-content">
+          <ion-icon name="navigate-outline" class="banner-icon"></ion-icon>
+          <span class="banner-text">Showing Nearest Cycle</span>
+          <ion-button fill="clear" size="small" (click)="showNearestMessage = false" class="banner-close-btn">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
+      
+      <div *ngIf="showReloadAnimation" class="reload-overlay">
+        <div class="reload-loader">
+          <ion-icon name="bicycle-outline" class="reload-cycle-icon"></ion-icon>
+          <p>Loading new cycles...</p>
+        </div>
+      </div>
+
+      <div *ngIf="filteredCycles.length === 0" class="empty-state">
+        <ion-icon name="bicycle-outline" class="empty-icon"></ion-icon>
+        <p>No cycles found</p>
+        <ion-button fill="outline" size="small" (click)="searchQuery = ''; selectedFilter = 'all'; filterCycles()">
+          Clear Filters
+        </ion-button>
+      </div>
+
+      <div *ngIf="filteredCycles.length > 0" class="cycles-scroll">
+        <div
+          class="cycle-card"
+          *ngFor="let cycle of filteredCycles">
+          <div class="cycle-image-container" (click)="viewCycleDetails(cycle)">
+            <img [src]="cycle.thumbnail" [alt]="cycle.title" class="cycle-image" />
+            <div class="cycle-overlay">
+              <div class="cycle-actions">
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  class="action-btn favorite-btn"
+                  (click)="$event.stopPropagation(); toggleFavorite(cycle.id)">
+                  <ion-icon [name]="isFavorite(cycle.id) ? 'heart' : 'heart-outline'"></ion-icon>
+                </ion-button>
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  class="action-btn share-btn"
+                  (click)="$event.stopPropagation(); shareCycle(cycle)">
+                  <ion-icon name="share-social-outline"></ion-icon>
+                </ion-button>
+              </div>
+            </div>
+            <div class="cycle-badge" *ngIf="cycle.battery" [attr.color]="getBatteryColor(cycle.battery)">
+              <ion-icon name="flash-outline"></ion-icon>
+              {{ cycle.battery }}%
+            </div>
+            <div class="cycle-status-badge" *ngIf="cycle.distance && cycle.distance <= 0.5">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              Nearby
+            </div>
+          </div>
+          <div class="cycle-info">
+            <div class="cycle-header">
+              <h4 class="cycle-name">{{ cycle.title }}</h4>
+              <div class="cycle-rating">
+                <ion-icon name="star"></ion-icon>
+                <span>4.{{ cycle.id % 10 }}</span>
+              </div>
+            </div>
+            <div class="cycle-details">
+              <div class="cycle-detail-item">
+                <ion-icon name="flash-outline"></ion-icon>
+                <span class="cycle-price">₹{{ cycle.price }}/min</span>
+              </div>
+              <div class="cycle-detail-item" *ngIf="cycle.distance">
+                <ion-icon name="location-outline"></ion-icon>
+                <span class="cycle-distance">{{ cycle.distance.toFixed(2) }} km</span>
+              </div>
+            </div>
+            <div class="cycle-progress-section" *ngIf="cycle.battery">
+              <div class="progress-label">
+                <span>Battery</span>
+                <span>{{ cycle.battery }}%</span>
+              </div>
+              <ion-progress-bar
+                [value]="cycle.battery / 100"
+                [color]="getBatteryColor(cycle.battery)"
+                class="cycle-progress">
+              </ion-progress-bar>
+            </div>
+            <ion-button
+              expand="block"
+              color="primary"
+              (click)="bookCycle(cycle)"
+              class="book-btn"
+              [disabled]="!!activeRide">
+              <ion-icon name="bicycle-outline" slot="start"></ion-icon>
+              Book Now
+            </ion-button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="offers-section fade-in">
+      <div class="section-header">
+        <h3 class="section-title">
+          <ion-icon name="flash-outline"></ion-icon>
+          Special Offers
+          <ion-badge color="warning" class="count-badge">HOT</ion-badge>
+        </h3>
+      </div>
+
+      <div *ngIf="offers.length === 0" class="empty-state">
+        <p>No offers available</p>
+      </div>
+
+      <div *ngIf="offers.length > 0" class="offers-scroll">
+        <div
+          class="offer-card"
+          *ngFor="let offer of offers; let i = index"
+          [style.animation-delay]="i * 0.15 + 's'">
+          <div class="offer-image-container">
+            <img [src]="offer.image" [alt]="offer.title" class="offer-image" />
+            <div class="offer-overlay"></div>
+            <div class="offer-badge" *ngIf="offer.discount">
+              {{ offer.discount }}
+            </div>
+          </div>
+          <div class="offer-content">
+            <h4 class="offer-title">{{ offer.title }}</h4>
+            <p class="offer-description">{{ offer.description }}</p>
+            <div class="offer-footer">
+              <ion-button fill="clear" size="small" color="primary" (click)="viewOfferDetails(offer); $event.stopPropagation()">
+                Learn More
+                <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="activity-section fade-in">
+      <div class="section-header">
+        <h3 class="section-title">
+          <ion-icon name="time-outline"></ion-icon>
+          Recent Activity
+        </h3>
+      </div>
+      <ion-card class="activity-card">
+        <ion-card-content>
+          <div *ngIf="recentActivities.length === 0" class="empty-state">
+            <p>No recent activity</p>
+          </div>
+          <div *ngFor="let activity of recentActivities" class="activity-item">
+            <div class="activity-icon" [attr.color]="activity.color">
+              <ion-icon [name]="activity.icon"></ion-icon>
+            </div>
+            <div class="activity-content">
+              <div class="activity-title">{{ activity.title }}</div>
+              <div class="activity-time">{{ activity.time }}</div>
+            </div>
+            <div class="activity-amount" [class.negative]="activity.amount < 0">
+              <span *ngIf="activity.amount > 0">+</span>₹{{ Math.abs(activity.amount).toFixed(2) }}
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+  </div>
+
+  
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="!isLoading">
+    <ion-fab-button color="primary" (click)="navigateToSchedule()" class="fab-button">
+      <ion-icon name="calendar-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>

@@ -1,0 +1,39 @@
+<ion-header [translucent]="true" class="custom-header">
+  <ion-toolbar color="transparent" class="header-toolbar">
+    
+    <div class="header-left" slot="start">
+      <div class="header-logo">
+        <ion-icon name="bicycle-outline" class="logo-icon"></ion-icon>
+      </div>
+      <div class="header-title-section">
+        <h1 class="header-title">RYDE</h1>
+        <span class="header-subtitle">Ride Smart</span>
+      </div>
+    </div>
+
+    
+    <div class="header-right" slot="end">
+      
+      <ion-button fill="clear" class="header-icon-btn" (click)="onSearchClick()">
+        <ion-icon name="search-outline" class="header-icon"></ion-icon>
+      </ion-button>
+
+      
+      <ion-button fill="clear" class="header-icon-btn notification-btn" (click)="onNotificationClick()">
+        <ion-icon name="notifications-outline" class="header-icon"></ion-icon>
+        <ion-badge *ngIf="notificationCount > 0" color="danger" class="notification-badge">
+          {{ notificationCount > 9 ? '9+' : notificationCount }}
+        </ion-badge>
+      </ion-button>
+
+      
+      <ion-button fill="clear" class="header-icon-btn profile-btn" (click)="onProfileClick()">
+        <div class="header-avatar">
+          <img *ngIf="userAvatar" [src]="userAvatar" [alt]="userName" class="avatar-img" />
+          <ion-icon *ngIf="!userAvatar" name="person-circle-outline" class="avatar-icon"></ion-icon>
+        </div>
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-header>
+

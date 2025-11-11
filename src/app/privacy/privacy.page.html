@@ -1,0 +1,86 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/tab5"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Privacy Policy</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="privacy-content">
+  
+  <div class="privacy-header">
+    <div class="header-icon-wrapper">
+      <ion-icon name="shield-checkmark-outline" class="header-icon"></ion-icon>
+    </div>
+    <h1 class="header-title">Privacy Policy</h1>
+    <p class="header-subtitle">Your privacy is important to us</p>
+    <div class="last-updated">
+      <ion-icon name="time-outline"></ion-icon>
+      <span>Last Updated: {{ lastUpdated }}</span>
+    </div>
+  </div>
+
+  
+  <div class="privacy-sections">
+    <ion-card 
+      *ngFor="let section of privacySections; let i = index"
+      class="privacy-card"
+      [style.animation-delay]="(i * 0.1) + 's'">
+      <ion-card-header>
+        <div class="section-header">
+          <div class="section-icon-wrapper">
+            <ion-icon [name]="section.icon" class="section-icon"></ion-icon>
+          </div>
+          <ion-card-title class="section-title">{{ section.title }}</ion-card-title>
+        </div>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="section-content">{{ section.content }}</div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  
+  <div class="privacy-footer">
+    <ion-card class="footer-card">
+      <ion-card-content>
+        <div class="footer-content">
+          <ion-icon name="shield-checkmark-outline" class="footer-icon"></ion-icon>
+          <h3>Your Data is Safe</h3>
+          <p>We are committed to protecting your privacy and ensuring the security of your personal information.</p>
+          <div class="footer-badges">
+            <div class="badge-item">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+              <span>Encrypted</span>
+            </div>
+            <div class="badge-item">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              <span>Secure</span>
+            </div>
+            <div class="badge-item">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
+              <span>Protected</span>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  
+  <div class="contact-section">
+    <ion-card class="contact-card">
+      <ion-card-header>
+        <ion-card-title>Questions?</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p>If you have any questions about our Privacy Policy, please don't hesitate to contact us.</p>
+        <ion-button expand="block" fill="outline" color="primary" class="contact-button" (click)="contactUs()">
+          <ion-icon name="mail-outline" slot="start"></ion-icon>
+          Contact Us
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

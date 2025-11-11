@@ -1,0 +1,613 @@
+$primary-color: #10B981;
+$accent-color: #059669;
+$secondary-color: #34D399;
+$background-color: #FFFFFF;
+$card-background: #FFFFFF;
+$white: #FFFFFF;
+$text-primary: #1F2937;
+$text-secondary: #4B5563;
+$text-light: #6B7280;
+$success-color: #10B981;
+$error-color: #EF4444;
+$border-color: #E5E7EB;
+$card-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+$card-shadow-hover: 0 8px 24px rgba(16, 185, 129, 0.15);
+$gradient-primary: linear-gradient(135deg, #10B981 0%, #059669 100%);
+$gradient-accent: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+
+$font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.profile-content {
+  --background: linear-gradient(to bottom, #F0FDF4 0%, #FFFFFF 100%);
+  font-family: $font-family;
+}
+
+.profile-header {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%);
+  box-shadow: 0 2px 12px rgba(16, 185, 129, 0.1);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+
+  .header-toolbar {
+    --background: transparent;
+    --color: $primary-color;
+    padding: 0.5rem 1rem;
+  }
+
+  .header-title {
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
+    background: $gradient-primary;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+.profile-header-section {
+  position: relative;
+  background: $gradient-primary;
+  padding: 2rem 1.5rem 3rem;
+  text-align: center;
+  color: $white;
+  animation: fadeIn 0.6s ease;
+  overflow: hidden;
+
+  .profile-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="2" fill="%2310B981" opacity="0.1"/><circle cx="80" cy="80" r="2" fill="%2310B981" opacity="0.1"/></svg>');
+    opacity: 0.3;
+  }
+
+  .profile-content-wrapper {
+    position: relative;
+    z-index: 1;
+  }
+
+  .profile-avatar-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1rem;
+
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border: 4px solid $white;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      margin: 0 auto;
+      animation: scaleIn 0.6s ease 0.2s both;
+    }
+
+    .edit-button {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      --color: $white;
+      --background: $gradient-primary;
+      --border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      margin: 0;
+      padding: 0;
+      border: 3px solid $white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+
+      &:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+      }
+
+      &:active {
+        transform: scale(0.95);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      ion-icon {
+        font-size: 1.4rem;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .user-name {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0.5rem 0 0.25rem;
+    color: $white;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    animation: fadeInUp 0.6s ease 0.3s both;
+  }
+
+  .user-email {
+    font-size: 1rem;
+    margin: 0 0 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    animation: fadeInUp 0.6s ease 0.4s both;
+  }
+
+  .member-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: $white;
+    font-weight: 500;
+    animation: fadeInUp 0.6s ease 0.5s both;
+
+    ion-icon {
+      font-size: 1rem;
+      color: $white;
+    }
+  }
+}
+
+.stats-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  margin-top: -2rem;
+  position: relative;
+  z-index: 1;
+  animation: fadeInUp 0.6s ease 0.2s both;
+
+  .stat-card {
+    margin: 0;
+    border-radius: 20px;
+    box-shadow: $card-shadow;
+    background: $card-background;
+    border: none;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: $gradient-primary;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    &:active {
+      transform: scale(0.98);
+      box-shadow: $card-shadow-hover;
+
+      &::before {
+        opacity: 1;
+      }
+    }
+
+    &.stat-primary::before {
+      background: $gradient-primary;
+    }
+
+    &.stat-success::before {
+      background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+    }
+
+    &.stat-warning::before {
+      background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+    }
+
+    &.stat-info::before {
+      background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+    }
+
+    ion-card-content {
+      padding: 1.25rem 1rem;
+
+      .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+
+        .stat-icon-wrapper {
+          width: 56px;
+          height: 56px;
+          border-radius: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+          transition: all 0.3s ease;
+
+          .stat-icon {
+            font-size: 1.75rem;
+            color: $primary-color;
+          }
+        }
+
+        .stat-details {
+          text-align: center;
+
+          h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: $text-primary;
+            line-height: 1.2;
+          }
+
+          p {
+            margin: 0.25rem 0 0;
+            font-size: 0.85rem;
+            color: $text-secondary;
+            font-weight: 500;
+          }
+        }
+      }
+    }
+
+    &.stat-success .stat-icon-wrapper {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.08) 100%);
+    }
+
+    &.stat-warning .stat-icon-wrapper {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.08) 100%);
+
+      .stat-icon {
+        color: #F59E0B;
+      }
+    }
+
+    &.stat-info .stat-icon-wrapper {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%);
+
+      .stat-icon {
+        color: #3B82F6;
+      }
+    }
+  }
+}
+
+.achievements-section {
+  padding: 1.5rem;
+  animation: fadeInUp 0.6s ease 0.4s both;
+
+  .section-header {
+    margin-bottom: 1rem;
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: $text-primary;
+      margin: 0;
+
+      ion-icon {
+        font-size: 1.3rem;
+        color: $primary-color;
+      }
+    }
+  }
+
+  .achievements-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .achievement-card {
+      background: $card-background;
+      border-radius: 16px;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: $card-shadow;
+      border: 2px solid $border-color;
+      transition: all 0.3s ease;
+      position: relative;
+      opacity: 0.6;
+
+      &.unlocked {
+        opacity: 1;
+        border-color: $primary-color;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.02) 100%);
+
+        .achievement-icon {
+          background: $gradient-primary;
+          color: $white;
+        }
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+
+      .achievement-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(16, 185, 129, 0.1);
+        transition: all 0.3s ease;
+
+        ion-icon {
+          font-size: 1.5rem;
+          color: $primary-color;
+        }
+      }
+
+      .achievement-content {
+        flex: 1;
+
+        h4 {
+          margin: 0 0 0.25rem;
+          font-size: 1rem;
+          font-weight: 600;
+          color: $text-primary;
+        }
+
+        p {
+          margin: 0;
+          font-size: 0.85rem;
+          color: $text-secondary;
+        }
+      }
+
+      .achievement-badge {
+        ion-icon {
+          font-size: 1.5rem;
+          color: $primary-color;
+        }
+      }
+    }
+  }
+}
+
+.menu-section {
+  padding: 0 1.5rem 1.5rem;
+  animation: fadeInUp 0.6s ease 0.6s both;
+
+  ion-list {
+    background: transparent;
+    padding: 0;
+
+    ion-list-header {
+      --background: transparent;
+      --color: $text-primary;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.5rem 0;
+      margin-bottom: 0.5rem;
+    }
+
+    .menu-item {
+      --background: $card-background;
+      --border-radius: 16px;
+      --padding-start: 1rem;
+      --padding-end: 1rem;
+      --min-height: 60px;
+      margin-bottom: 0.75rem;
+      box-shadow: $card-shadow;
+      border: 1px solid $border-color;
+      transition: all 0.3s ease;
+
+      &:active {
+        transform: scale(0.98);
+        box-shadow: $card-shadow-hover;
+        border-color: $primary-color;
+      }
+
+      .menu-item-content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex: 1;
+
+        .menu-icon-wrapper {
+          position: relative;
+          width: 40px;
+          height: 40px;
+          border-radius: 12px;
+          background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          .menu-icon {
+            color: $primary-color;
+            font-size: 1.3rem;
+          }
+
+          .menu-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            font-size: 0.65rem;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 4px;
+          }
+        }
+
+        .menu-label {
+          font-weight: 500;
+          color: $text-primary;
+          font-size: 0.95rem;
+        }
+      }
+
+      .chevron-icon {
+        color: $text-light;
+        font-size: 1.2rem;
+      }
+    }
+  }
+}
+
+.logout-section {
+  padding: 0 1.5rem 1rem;
+  animation: fadeInUp 0.6s ease 0.8s both;
+
+  .logout-button {
+    --border-radius: 16px;
+    --border-width: 2px;
+    --border-color: $error-color;
+    --color: $error-color;
+    height: 56px;
+    font-weight: 600;
+    text-transform: none;
+    font-size: 1rem;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+    transition: all 0.3s ease;
+
+    &:active {
+      transform: scale(0.98);
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    }
+
+    ion-icon {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+.footer-section {
+  padding: 0.5rem 1.5rem 1rem;
+  text-align: center;
+  animation: fadeInUp 0.6s ease 1s both;
+
+  .footer-text {
+    margin: 0;
+    font-size: 0.875rem;
+    color: $text-secondary;
+    opacity: 0.5;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    transition: opacity 0.3s ease;
+
+    .heart-icon {
+      display: inline-block;
+      margin: 0 0.25rem;
+      font-size: 0.9rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-header-section {
+    padding: 1.5rem 1rem 2.5rem;
+
+    .profile-avatar-container .profile-avatar {
+      width: 100px;
+      height: 100px;
+    }
+
+    .user-name {
+      font-size: 1.5rem;
+    }
+  }
+
+  .stats-section {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    padding: 1rem;
+
+    .stat-card ion-card-content {
+      padding: 1rem 0.75rem;
+
+      .stat-item {
+        .stat-icon-wrapper {
+          width: 48px;
+          height: 48px;
+
+          .stat-icon {
+            font-size: 1.5rem;
+          }
+        }
+
+        .stat-details h3 {
+          font-size: 1.3rem;
+        }
+      }
+    }
+  }
+}
+
+* {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}

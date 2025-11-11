@@ -1,0 +1,275 @@
+<ion-content [fullscreen]="true" class="login-content">
+  
+  <div class="animated-background">
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+    <div class="floating-shape shape-3"></div>
+    <div class="floating-shape shape-4"></div>
+    <div class="floating-shape shape-5"></div>
+    <div class="floating-shape shape-6"></div>
+  </div>
+
+  
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="loading-content">
+      <div class="cycle-loader-container">
+        <ion-icon name="bicycle-outline" class="cycle-loader-icon"></ion-icon>
+      </div>
+      <p class="loading-text">{{ isLoginMode ? 'Logging in...' : 'Creating account...' }}</p>
+    </div>
+  </div>
+
+  
+  <div class="login-container">
+    
+    <div class="logo-section fade-in">
+      <div class="logo-container">
+        <ion-icon name="bicycle-outline" class="logo-icon"></ion-icon>
+      </div>
+      <h1 class="app-title">Campus Cycle</h1>
+      <p class="app-subtitle">{{ isLoginMode ? 'Welcome back!' : 'Join us today!' }}</p>
+    </div>
+
+    
+    <div class="photo-upload-section" *ngIf="!isLoginMode">
+      <div class="photo-preview-container">
+        <input type="file" #photoInput accept="image/*" style="display: none;" (change)="onPhotoSelected($event)">
+        <div class="photo-preview" [class.has-photo]="selectedPhoto" (click)="photoInput.click()">
+          <img *ngIf="selectedPhoto" [src]="selectedPhoto" alt="Profile Photo" class="preview-image">
+          <ion-icon *ngIf="!selectedPhoto" name="person-outline" class="placeholder-icon"></ion-icon>
+          <div class="photo-overlay">
+            <ion-icon name="camera-outline"></ion-icon>
+            <span>{{ selectedPhoto ? 'Change Photo' : 'Add Photo' }}</span>
+          </div>
+        </div>
+        <ion-button fill="clear" class="photo-upload-btn" (click)="photoInput.click()">
+          <ion-icon name="camera-outline" slot="start"></ion-icon>
+          {{ selectedPhoto ? 'Change Photo' : 'Add Photo' }}
+        </ion-button>
+      </div>
+    </div>
+
+    
+    <div class="form-container slide-up">
+      
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()" *ngIf="isLoginMode" class="auth-form">
+        <div class="input-group">
+          <ion-item class="custom-input" lines="none">
+            <ion-icon name="person-outline" slot="start" class="input-icon"></ion-icon>
+            <ion-input
+              type="text"
+              placeholder="Your Name"
+              formControlName="name"
+              class="input-field"
+            ></ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="loginForm.get('name')?.invalid && loginForm.get('name')?.touched">
+            <span *ngIf="loginForm.get('name')?.errors?.['required']">Name is required</span>
+            <span *ngIf="loginForm.get('name')?.errors?.['minlength']">Name must be at least 3 characters</span>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <ion-item class="custom-input" lines="none">
+            <ion-icon name="mail-outline" slot="start" class="input-icon"></ion-icon>
+            <ion-input
+              type="email"
+              placeholder="Email address"
+              formControlName="email"
+              class="input-field"
+            ></ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="email?.invalid && email?.touched">
+            <span *ngIf="email?.errors?.['required']">Email is required</span>
+            <span *ngIf="email?.errors?.['email']">Invalid email format</span>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <ion-item class="custom-input" lines="none">
+            <ion-icon name="lock-closed-outline" slot="start" class="input-icon"></ion-icon>
+            <ion-input
+              [type]="showPassword ? 'text' : 'password'"
+              placeholder="Password"
+              formControlName="password"
+              class="input-field"
+            ></ion-input>
+            <ion-button
+              fill="clear"
+              slot="end"
+              (click)="togglePasswordVisibility()"
+              class="eye-button"
+            >
+              <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+            </ion-button>
+          </ion-item>
+          <div class="error-message" *ngIf="password?.invalid && password?.touched">
+            <span *ngIf="password?.errors?.['required']">Password is required</span>
+            <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</span>
+          </div>
+        </div>
+
+        <div class="form-options">
+          <ion-item lines="none" class="remember-me">
+            <ion-checkbox [(ngModel)]="rememberMe" [ngModelOptions]="{standalone: true}"></ion-checkbox>
+            <ion-label>Remember me</ion-label>
+          </ion-item>
+          <ion-button fill="clear" class="forgot-password">Forgot Password?</ion-button>
+        </div>
+
+        <ion-button
+          expand="block"
+          class="primary-button"
+          type="submit"
+          [disabled]="loginForm.invalid || isLoading"
+        >
+          <span *ngIf="!isLoading">Login</span>
+          <span *ngIf="isLoading" class="button-loading-content">
+            <ion-spinner name="crescent" class="button-spinner"></ion-spinner>
+            <span class="button-loading-text">Logging in...</span>
+          </span>
+        </ion-button>
+      </form>
+
+      
+      <form [formGroup]="registerForm" (ngSubmit)="onRegister()" *ngIf="!isLoginMode" class="auth-form">
+        <div class="input-group">
+          <ion-item class="custom-input" lines="none">
+            <ion-icon name="person-outline" slot="start" class="input-icon"></ion-icon>
+            <ion-input
+              type="text"
+              placeholder="Full Name"
+              formControlName="name"
+              class="input-field"
+            ></ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="registerForm.get('name')?.invalid && registerForm.get('name')?.touched">
+            <span *ngIf="registerForm.get('name')?.errors?.['required']">Name is required</span>
+            <span *ngIf="registerForm.get('name')?.errors?.['minlength']">Name must be at least 3 characters</span>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <ion-item class="custom-input" lines="none">
+            <ion-icon name="mail-outline" slot="start" class="input-icon"></ion-icon>
+            <ion-input
+              type="email"
+              placeholder="Email address"
+              formControlName="email"
+              class="input-field"
+            ></ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+            <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required</span>
+            <span *ngIf="registerForm.get('email')?.errors?.['email']">Invalid email format</span>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <ion-item class="custom-input" lines="none">
+            <ion-icon name="call-outline" slot="start" class="input-icon"></ion-icon>
+            <ion-input
+              type="tel"
+              placeholder="Phone Number"
+              formControlName="phone"
+              class="input-field"
+            ></ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched">
+            <span *ngIf="registerForm.get('phone')?.errors?.['required']">Phone is required</span>
+            <span *ngIf="registerForm.get('phone')?.errors?.['pattern']">Invalid phone number</span>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <ion-item class="custom-input" lines="none">
+            <ion-icon name="lock-closed-outline" slot="start" class="input-icon"></ion-icon>
+            <ion-input
+              [type]="showPassword ? 'text' : 'password'"
+              placeholder="Password"
+              formControlName="password"
+              class="input-field"
+            ></ion-input>
+            <ion-button
+              fill="clear"
+              slot="end"
+              (click)="togglePasswordVisibility()"
+              class="eye-button"
+            >
+              <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+            </ion-button>
+          </ion-item>
+          <div class="error-message" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+            <span *ngIf="registerForm.get('password')?.errors?.['required']">Password is required</span>
+            <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</span>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <ion-item class="custom-input" lines="none">
+            <ion-icon name="lock-closed-outline" slot="start" class="input-icon"></ion-icon>
+            <ion-input
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              placeholder="Confirm Password"
+              formControlName="confirmPassword"
+              class="input-field"
+            ></ion-input>
+            <ion-button
+              fill="clear"
+              slot="end"
+              (click)="toggleConfirmPasswordVisibility()"
+              class="eye-button"
+            >
+              <ion-icon [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+            </ion-button>
+          </ion-item>
+          <div class="error-message" *ngIf="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched">
+            <span *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">Please confirm password</span>
+            <span *ngIf="registerForm.get('confirmPassword')?.errors?.['passwordMismatch']">Passwords do not match</span>
+          </div>
+        </div>
+
+        <ion-button
+          expand="block"
+          class="primary-button"
+          type="submit"
+          [disabled]="registerForm.invalid || isLoading"
+        >
+          <span *ngIf="!isLoading">Create Account</span>
+          <span *ngIf="isLoading" class="button-loading-content">
+            <ion-spinner name="crescent" class="button-spinner"></ion-spinner>
+            <span class="button-loading-text">Creating account...</span>
+          </span>
+        </ion-button>
+      </form>
+
+      
+      <div class="social-login">
+        <div class="divider">
+          <span>or continue with</span>
+        </div>
+        <div class="social-buttons">
+          <ion-button class="social-button google" (click)="onSocialLogin('Google')">
+            <ion-icon name="logo-google"></ion-icon>
+          </ion-button>
+          <ion-button class="social-button facebook" (click)="onSocialLogin('Facebook')">
+            <ion-icon name="logo-facebook"></ion-icon>
+          </ion-button>
+          <ion-button class="social-button apple" (click)="onSocialLogin('Apple')">
+            <ion-icon name="logo-apple"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
+      
+      <div class="toggle-mode">
+        <p>
+          {{ isLoginMode ? "Don't have an account?" : 'Already have an account?' }}
+          <ion-button fill="clear" class="toggle-button" (click)="toggleMode()">
+            {{ isLoginMode ? 'Sign Up' : 'Sign In' }}
+          </ion-button>
+        </p>
+      </div>
+    </div>
+  </div>
+</ion-content>

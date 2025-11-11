@@ -1,0 +1,157 @@
+<app-header
+  [userName]="loggedInUserName || userName"
+  [userAvatar]="userAvatar"
+  [notificationCount]="notificationCount">
+</app-header>
+
+<ion-content [fullscreen]="true" class="map-content">
+
+  
+  <div class="map-wrapper">
+    <div #mapContainer class="map-container" [class.loading]="isMapLoading">
+      <div *ngIf="isMapLoading" class="map-loader">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Loading LPU Campus Map...</p>
+      </div>
+    </div>
+
+    
+    <div class="map-controls">
+      <ion-button
+        fill="solid"
+        color="primary"
+        class="control-btn"
+        (click)="centerOnCampus()"
+        title="Center on LPU Campus">
+        <ion-icon name="map-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+
+      <ion-button
+        fill="solid"
+        color="secondary"
+        class="control-btn"
+        (click)="centerOnUser()"
+        title="Your Location">
+        <ion-icon name="locate-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+
+      <ion-button
+        fill="solid"
+        color="tertiary"
+        class="control-btn"
+        (click)="refreshCycles()"
+        title="Refresh Cycles">
+        <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+
+    
+    <div class="cycle-count-badge">
+      <ion-icon name="bicycle-outline"></ion-icon>
+      <span>{{ filteredCycles.length }} Cycles Available</span>
+    </div>
+  </div>
+
+  
+  <div class="filter-footer">
+    <div class="filter-chips">
+      <ion-chip
+        [color]="selectedFilter === 'all' ? 'primary' : 'medium'"
+        (click)="filterCycles('all')"
+        class="filter-chip">
+        <ion-label>All</ion-label>
+      </ion-chip>
+      <ion-chip
+        [color]="selectedFilter === 'nearby' ? 'primary' : 'medium'"
+        (click)="filterCycles('nearby')"
+        class="filter-chip">
+        <ion-icon name="location-outline"></ion-icon>
+        <ion-label>Nearby</ion-label>
+      </ion-chip>
+      <ion-chip
+        [color]="selectedFilter === 'battery' ? 'primary' : 'medium'"
+        (click)="filterCycles('battery')"
+        class="filter-chip">
+        <ion-icon name="flash-outline"></ion-icon>
+        <ion-label>High Battery</ion-label>
+      </ion-chip>
+      <ion-chip
+        [color]="selectedFilter === 'price' ? 'primary' : 'medium'"
+        (click)="filterCycles('price')"
+        class="filter-chip">
+        <ion-icon name="wallet-outline"></ion-icon>
+        <ion-label>Low Price</ion-label>
+      </ion-chip>
+    </div>
+  </div>
+
+  
+  <div class="cycle-list-container" [class.show]="showCycleList || selectedCycle">
+    <div class="cycle-list-header">
+      <h3>Available Cycles</h3>
+      <ion-button fill="clear" size="small" (click)="showCycleList = false; selectedCycle = null">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="cycle-list" *ngIf="!isLoading">
+      <div
+        class="cycle-item"
+        *ngFor="let cycle of filteredCycles"
+        [class.selected]="selectedCycle?.id === cycle.id"
+        (click)="selectCycle(cycle)">
+        <div class="cycle-item-image">
+          <img [src]="cycle.thumbnail" [alt]="cycle.title" />
+          <div class="cycle-item-badge" [attr.color]="getBatteryColor(cycle.battery || 0)">
+            <ion-icon name="flash-outline"></ion-icon>
+            {{ cycle.battery }}%
+          </div>
+        </div>
+        <div class="cycle-item-content">
+          <h4>{{ cycle.title }}</h4>
+          <div class="cycle-item-details">
+            <div class="detail-item">
+              <ion-icon name="wallet-outline"></ion-icon>
+              <span>₹{{ cycle.price }}/min</span>
+            </div>
+            <div class="detail-item">
+              <ion-icon name="location-outline"></ion-icon>
+              <span>{{ cycle.distance }} km</span>
+            </div>
+            <div class="detail-item">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              <span>{{ cycle.condition }}</span>
+            </div>
+          </div>
+          <div class="cycle-item-location">
+            <ion-icon name="pin-outline"></ion-icon>
+            <span>{{ cycle.location }}</span>
+          </div>
+        </div>
+        <div class="cycle-item-action">
+          <ion-button fill="solid" color="primary" size="small" (click)="viewCycleDetails(cycle); $event.stopPropagation()">
+            View
+          </ion-button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-state">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading cycles...</p>
+    </div>
+
+    <div *ngIf="!isLoading && filteredCycles.length === 0" class="empty-state">
+      <ion-icon name="bicycle-outline"></ion-icon>
+      <p>No cycles available</p>
+    </div>
+  </div>
+
+  
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="primary" (click)="showCycleList = !showCycleList">
+      <ion-icon name="list-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>

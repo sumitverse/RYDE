@@ -1,0 +1,80 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/tab1"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Cycle Details</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="cycle" class="cycle-details-content">
+  
+  <div class="cycle-image-section">
+    <img [src]="cycle.thumbnail" [alt]="cycle.title" class="cycle-main-image" />
+    <div class="cycle-badge-overlay" *ngIf="cycle.battery">
+      <ion-chip [color]="getBatteryColor(cycle.battery)" class="battery-chip">
+        <ion-icon name="flash-outline"></ion-icon>
+        <span>{{ cycle.battery }}%</span>
+      </ion-chip>
+    </div>
+  </div>
+
+  
+  <ion-card class="cycle-info-card">
+    <ion-card-content>
+      <div class="cycle-header">
+        <h1 class="cycle-title">{{ cycle.title }}</h1>
+        <div class="cycle-rating">
+          <ion-icon name="star"></ion-icon>
+          <span>4.{{ cycle.id % 10 }}</span>
+        </div>
+      </div>
+
+      <div class="cycle-price-section">
+        <span class="price-label">Price</span>
+        <span class="price-value">₹{{ cycle.price }}/min</span>
+      </div>
+
+      
+      <div class="detail-section">
+        <div class="detail-header">
+          <ion-icon [name]="getConditionIcon(cycle.condition)" [color]="getConditionColor(cycle.condition)"></ion-icon>
+          <h3>Condition</h3>
+        </div>
+        <ion-chip [color]="getConditionColor(cycle.condition)" class="condition-chip">
+          {{ cycle.condition || 'Not specified' }}
+        </ion-chip>
+      </div>
+
+      
+      <div class="detail-section">
+        <div class="detail-header">
+          <ion-icon name="location-outline" color="primary"></ion-icon>
+          <h3>Location</h3>
+        </div>
+        <p class="location-text">{{ cycle.location || 'Campus Location' }}</p>
+        <div class="location-details" *ngIf="cycle.distance">
+          <ion-icon name="navigate-outline"></ion-icon>
+          <span>{{ cycle.distance }} km away</span>
+        </div>
+      </div>
+
+      
+      <div class="detail-section" *ngIf="cycle.battery">
+        <div class="detail-header">
+          <ion-icon name="flash-outline" [color]="getBatteryColor(cycle.battery)"></ion-icon>
+          <h3>Battery Level</h3>
+        </div>
+        <div class="battery-progress">
+          <ion-progress-bar 
+            [value]="cycle.battery / 100" 
+            [color]="getBatteryColor(cycle.battery)"
+            class="battery-bar">
+          </ion-progress-bar>
+          <span class="battery-percentage">{{ cycle.battery }}%</span>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
+
