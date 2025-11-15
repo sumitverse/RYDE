@@ -1,5 +1,5 @@
 <ion-content [fullscreen]="true" class="help-content">
-  
+
   <div class="chat-section">
     <div class="chat-header">
       <ion-button (click)="goBack()" fill="clear" class="back-button">
@@ -24,11 +24,11 @@
       </div>
     </div>
 
-    
+
     <div class="messages-container" #chatContainer>
       <div class="messages-list">
-        <div 
-          *ngFor="let message of messages" 
+        <div
+          *ngFor="let message of messages"
           class="message-wrapper"
           [class.user-message]="message.sender === 'user'"
           [class.bot-message]="message.sender === 'bot'">
@@ -46,7 +46,7 @@
           </div>
         </div>
 
-        
+
         <div class="message-wrapper bot-message" *ngIf="isTyping">
           <div class="message-bubble bot-bubble">
             <div class="message-content">
@@ -64,7 +64,7 @@
       </div>
     </div>
 
-    
+
     <div class="message-input-container">
       <div class="input-wrapper">
         <ion-input
@@ -75,8 +75,8 @@
           (keyup.enter)="sendMessage()"
           [disabled]="isLoading">
         </ion-input>
-        <ion-button 
-          (click)="sendMessage()" 
+        <ion-button
+          (click)="sendMessage()"
           [disabled]="!newMessage.trim() || isLoading"
           class="send-button"
           fill="solid"
@@ -87,3 +87,4 @@
     </div>
   </div>
 </ion-content>
+ 

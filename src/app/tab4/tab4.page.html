@@ -11,16 +11,15 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="wallet-content">
-  
+
   <div *ngIf="isLoading" class="loading-container">
     <ion-spinner name="crescent"></ion-spinner>
     <p>Loading wallet...</p>
   </div>
 
-  
   <div *ngIf="!isLoading" class="content-wrapper">
-    
-    
+
+
     <div class="balance-card fade-in">
       <div class="balance-header">
         <div class="balance-label">
@@ -43,7 +42,7 @@
       </div>
     </div>
 
-    
+
     <div class="quick-actions-section fade-in">
       <h3 class="section-title">Quick Actions</h3>
       <div class="actions-grid">
@@ -56,7 +55,7 @@
       </div>
     </div>
 
-    
+
     <div class="qr-code-section fade-in">
       <div class="section-header">
         <h3 class="section-title">
@@ -67,8 +66,8 @@
       <ion-card class="qr-code-card">
         <ion-card-content>
           <div class="qr-code-container">
-            <img 
-              src="https://raw.githubusercontent.com/sumitverse/monkey-banana/main/WhatsApp%20Image%202025-11-09%20at%2000.18.45_1ac31441.jpg"
+            <img
+              src="https://github.com/sumitverse/monkey-banana/blob/main/Screenshot%202025-11-11%20132738.png?raw=true"
               alt="UPI QR Code"
               class="qr-code-image"
               (error)="onQrImageError($event)" />
@@ -83,7 +82,7 @@
       </ion-card>
     </div>
 
-    
+
     <div class="transactions-section fade-in">
       <div class="section-header">
         <h3 class="section-title">
@@ -102,8 +101,8 @@
       </ion-card>
 
       <div *ngIf="getRecentTransactions().length > 0" class="transactions-list">
-        <ion-card 
-          *ngFor="let transaction of getRecentTransactions(); let i = index" 
+        <ion-card
+          *ngFor="let transaction of getRecentTransactions(); let i = index"
           class="transaction-card"
           [style.animation-delay]="i * 0.1 + 's'">
           <ion-card-content>
@@ -114,7 +113,7 @@
               <div class="transaction-details">
                 <div class="transaction-title">{{ transaction.description }}</div>
                 <div class="transaction-meta">
-                  <ion-chip 
+                  <ion-chip
                     [color]="transaction.status === 'completed' ? 'success' : transaction.status === 'pending' ? 'warning' : 'danger'"
                     size="small"
                     class="status-chip">
@@ -133,7 +132,7 @@
       </div>
     </div>
 
-    
+
     <div class="stats-section fade-in">
       <h3 class="section-title">This Month</h3>
       <div class="stats-grid">

@@ -1,0 +1,333 @@
+<ion-header [translucent]="true" class="payment-header">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" class="back-button">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <div class="header-content">
+      <div class="gateway-logo">
+        <div class="logo-icon">Pay</div>
+      </div>
+      <ion-title>PaySecure</ion-title>
+    </div>
+    <div slot="end" class="security-badge">
+      <ion-icon name="shield-checkmark-outline"></ion-icon>
+      <span>256-bit SSL</span>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="payment-content">
+  
+  <!-- Initializing Payment Gateway Loading -->
+  <div *ngIf="isInitializing" class="initializing-overlay">
+    <div class="initializing-content">
+      <div class="loading-spinner">
+        <div class="spinner-ring-large"></div>
+        <div class="spinner-ring-medium"></div>
+        <div class="spinner-ring-small"></div>
+        <div class="spinner-center">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+        </div>
+      </div>
+      <h2 class="initializing-title">Initializing Payment Gateway</h2>
+      <p class="initializing-subtitle">Please wait while we set up your secure payment session</p>
+      <div class="loading-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Amount Display -->
+  <div *ngIf="!isInitializing" class="amount-section">
+    <div class="amount-label">Amount to Pay</div>
+    <div class="amount-value">₹{{ amount.toFixed(2) }}</div>
+    <div class="amount-subtitle">Wallet Recharge</div>
+  </div>
+
+  <!-- Payment Method Selection -->
+  <div *ngIf="!isInitializing && !selectedPaymentMethod && !isProcessing && paymentStatus === null" class="payment-methods-section">
+    <h3 class="section-title">Choose Payment Method</h3>
+    <div class="methods-grid">
+      <div 
+        *ngFor="let method of paymentMethodKeys"
+        class="method-card"
+        (click)="selectPaymentMethod(method)"
+        [style.--method-color]="paymentMethods[method].color">
+        <div class="method-icon-wrapper">
+          <div class="method-icon" [style.background]="paymentMethods[method].color">
+            <ion-icon [name]="paymentMethods[method].icon"></ion-icon>
+          </div>
+        </div>
+        <div class="method-info">
+          <div class="method-name">{{ paymentMethods[method].name }}</div>
+          <div class="method-description">{{ paymentMethods[method].description }}</div>
+        </div>
+        <div class="method-arrow">
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Form -->
+  <div *ngIf="!isInitializing && selectedPaymentMethod && !isProcessing && paymentStatus === null" class="payment-form-section">
+    
+    <!-- Card Payment Form -->
+    <div *ngIf="selectedPaymentMethod === 'card'" class="payment-form">
+      <div class="form-header">
+        <ion-button fill="clear" (click)="goBackToMethods()" class="back-method-btn">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </ion-button>
+        <h3>Card Details</h3>
+      </div>
+
+      <div class="card-preview" *ngIf="cardNumber || cardName">
+        <div class="card-front" [class.visa]="cardType === 'visa'" [class.mastercard]="cardType === 'mastercard'" [class.amex]="cardType === 'amex'">
+          <div class="card-chip"></div>
+          <div class="card-number">{{ cardNumber || '1234 5678 9012 3456' }}</div>
+          <div class="card-details">
+            <div class="card-name">{{ cardName || 'CARDHOLDER NAME' }}</div>
+            <div class="card-expiry">{{ cardExpiry || 'MM/YY' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Card Number</label>
+        <div class="input-wrapper">
+          <input 
+            type="text" 
+            placeholder="1234 5678 9012 3456"
+            [(ngModel)]="cardNumber"
+            (input)="formatCardNumber($event)"
+            maxlength="19"
+            class="form-input">
+          <div class="card-type-icons">
+            <span class="card-type-icon visa" [class.active]="cardType === 'visa'">VISA</span>
+            <span class="card-type-icon mastercard" [class.active]="cardType === 'mastercard'">MC</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Cardholder Name</label>
+        <input 
+          type="text" 
+          placeholder="John Doe"
+          [(ngModel)]="cardName"
+          class="form-input">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Expiry Date</label>
+          <input 
+            type="text" 
+            placeholder="MM/YY"
+            [(ngModel)]="cardExpiry"
+            (input)="formatExpiry($event)"
+            maxlength="5"
+            class="form-input">
+        </div>
+        
+        <div class="form-group">
+          <label>CVV</label>
+          <input 
+            type="password" 
+            placeholder="123"
+            [(ngModel)]="cardCvv"
+            (input)="formatCvv($event)"
+            maxlength="3"
+            class="form-input">
+        </div>
+      </div>
+
+      <ion-button expand="block" class="pay-button" (click)="processPayment()">
+        <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+        Pay ₹{{ amount.toFixed(2) }}
+      </ion-button>
+    </div>
+
+    <!-- UPI Payment Form -->
+    <div *ngIf="selectedPaymentMethod === 'upi'" class="payment-form">
+      <div class="form-header">
+        <ion-button fill="clear" (click)="goBackToMethods()" class="back-method-btn">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </ion-button>
+        <h3>UPI Payment</h3>
+      </div>
+
+      <div class="upi-illustration">
+        <div class="upi-icon">
+          <ion-icon name="phone-portrait-outline"></ion-icon>
+        </div>
+        <p>Enter your UPI ID to pay instantly</p>
+      </div>
+
+      <div class="form-group upi-input-group">
+        <label>UPI ID</label>
+        <div class="upi-input-wrapper">
+          <div class="upi-input-icon">
+            <ion-icon name="phone-portrait-outline"></ion-icon>
+          </div>
+          <input 
+            type="text" 
+            placeholder="yourname@paytm"
+            [(ngModel)]="upiId"
+            (input)="onUpiIdChange($event)"
+            class="form-input upi-input"
+            [class.valid]="isValidUpi"
+            [class.invalid]="upiId.length > 0 && !isValidUpi">
+          <div class="upi-validation-icon" *ngIf="upiId.length > 0">
+            <ion-icon 
+              *ngIf="isValidUpi" 
+              name="checkmark-circle" 
+              class="valid-icon">
+            </ion-icon>
+            <ion-icon 
+              *ngIf="!isValidUpi" 
+              name="close-circle" 
+              class="invalid-icon">
+            </ion-icon>
+          </div>
+        </div>
+        <div class="upi-hint" *ngIf="upiId.length > 0 && !isValidUpi">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          <span>Enter a valid UPI ID (e.g., yourname@paytm, yourname@ybl)</span>
+        </div>
+        <div class="upi-success" *ngIf="isValidUpi">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>Valid UPI ID</span>
+        </div>
+      </div>
+
+      <ion-button expand="block" class="pay-button" (click)="processPayment()">
+        <ion-icon name="phone-portrait-outline" slot="start"></ion-icon>
+        Pay ₹{{ amount.toFixed(2) }}
+      </ion-button>
+    </div>
+
+    <!-- Net Banking Form -->
+    <div *ngIf="selectedPaymentMethod === 'netbanking'" class="payment-form">
+      <div class="form-header">
+        <ion-button fill="clear" (click)="goBackToMethods()" class="back-method-btn">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </ion-button>
+        <h3>Net Banking</h3>
+      </div>
+
+      <div class="form-group">
+        <label>Select Bank</label>
+        <div class="bank-list">
+          <div 
+            *ngFor="let bank of banks"
+            class="bank-item"
+            [class.selected]="selectedBank === bank"
+            (click)="selectedBank = bank">
+            <div class="bank-icon">{{ bank.charAt(0) }}</div>
+            <span class="bank-name">{{ bank }}</span>
+            <ion-icon name="checkmark-circle-outline" *ngIf="selectedBank === bank"></ion-icon>
+          </div>
+        </div>
+      </div>
+
+      <ion-button expand="block" class="pay-button" (click)="processPayment()" [disabled]="!selectedBank">
+        <ion-icon name="business-outline" slot="start"></ion-icon>
+        Pay ₹{{ amount.toFixed(2) }}
+      </ion-button>
+    </div>
+
+    <!-- Wallet Form -->
+    <div *ngIf="selectedPaymentMethod === 'wallet'" class="payment-form">
+      <div class="form-header">
+        <ion-button fill="clear" (click)="goBackToMethods()" class="back-method-btn">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </ion-button>
+        <h3>Wallets</h3>
+      </div>
+
+      <div class="form-group">
+        <label>Select Wallet</label>
+        <div class="wallet-grid">
+          <div 
+            *ngFor="let wallet of wallets"
+            class="wallet-item"
+            [class.selected]="selectedBank === wallet"
+            (click)="selectedBank = wallet">
+            <div class="wallet-icon">
+              <img [src]="getWalletLogo(wallet)" [alt]="wallet" (error)="$event.target.src='https://via.placeholder.com/60?text=' + wallet.charAt(0)">
+            </div>
+            <span class="wallet-name">{{ wallet }}</span>
+            <ion-icon name="checkmark-circle-outline" *ngIf="selectedBank === wallet"></ion-icon>
+          </div>
+        </div>
+      </div>
+
+      <ion-button expand="block" class="pay-button" (click)="processPayment()" [disabled]="!selectedBank">
+        <ion-icon name="wallet-outline" slot="start"></ion-icon>
+        Pay ₹{{ amount.toFixed(2) }}
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Processing State -->
+  <div *ngIf="isProcessing" class="processing-state">
+    <div class="coin-animation-container">
+      <div class="wallet-icon-large">
+        <ion-icon name="wallet-outline"></ion-icon>
+      </div>
+      <div class="coins-wrapper">
+        <div class="coin coin-1">₹</div>
+        <div class="coin coin-2">₹</div>
+        <div class="coin coin-3">₹</div>
+        <div class="coin coin-4">₹</div>
+        <div class="coin coin-5">₹</div>
+        <div class="coin coin-6">₹</div>
+      </div>
+      <div class="money-flow">
+        <div class="money-bill bill-1">₹</div>
+        <div class="money-bill bill-2">₹</div>
+        <div class="money-bill bill-3">₹</div>
+      </div>
+    </div>
+    <h3>Processing Payment</h3>
+    <p>Adding ₹{{ amount.toFixed(2) }} to your wallet</p>
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+  </div>
+
+  <!-- Payment Success State -->
+  <div *ngIf="paymentStatus === 'success'" class="payment-result success">
+    <div class="success-animation">
+      <div class="checkmark-circle">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+      </div>
+    </div>
+    <h2>Payment Successful!</h2>
+    <p class="amount-text">₹{{ amount.toFixed(2) }} has been added to your wallet</p>
+    <p class="redirect-text">Redirecting back...</p>
+  </div>
+
+  <!-- Payment Failed State -->
+  <div *ngIf="paymentStatus === 'failed'" class="payment-result failed">
+    <div class="failed-animation">
+      <ion-icon name="close-circle-outline"></ion-icon>
+    </div>
+    <h2>Payment Failed</h2>
+    <p>Please try again</p>
+    <ion-button (click)="selectedPaymentMethod = null; paymentStatus = null">Try Again</ion-button>
+  </div>
+
+  <!-- Security Footer -->
+  <div class="security-footer" *ngIf="!isInitializing && paymentStatus === null">
+    <ion-icon name="shield-checkmark-outline"></ion-icon>
+    <span>Your payment is secured with 256-bit SSL encryption</span>
+  </div>
+
+</ion-content>
+

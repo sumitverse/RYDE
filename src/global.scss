@@ -200,3 +200,34 @@ ion-tab-bar {
     box-shadow: 0 0 40px rgba(16, 185, 129, 0.4);
   }
 }
+
+// Add Money Modal Styles - Full Screen
+.add-money-modal {
+  --width: 100% !important;
+  --height: 100% !important;
+  --max-width: 100% !important;
+  --max-height: 100% !important;
+  --border-radius: 0 !important;
+  --box-shadow: none !important;
+  
+  .modal-wrapper {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+    overflow: hidden;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+  }
+  
+  ion-content {
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+  }
+}

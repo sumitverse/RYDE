@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { EmailService } from '../services/email.service';
+import { AdminService } from '../services/admin.service';
 import {
   IonContent,
   IonHeader,
@@ -28,7 +30,9 @@ import {
   bicycleOutline,
   personOutline,
   callOutline,
-  cameraOutline
+  cameraOutline,
+  shieldCheckmarkOutline,
+  peopleOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -57,6 +61,7 @@ export class LoginPage implements OnInit {
   loginForm!: FormGroup;
   registerForm!: FormGroup;
   isLoginMode: boolean = true;
+  loginType: 'rider' | 'admin' = 'rider'; // Always rider, admin removed from UI
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
   isLoading: boolean = false;
@@ -66,7 +71,9 @@ export class LoginPage implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private emailService: EmailService,
+    private adminService: AdminService
   ) {
     addIcons({
       mailOutline,
@@ -79,7 +86,9 @@ export class LoginPage implements OnInit {
       bicycleOutline,
       personOutline,
       callOutline,
-      cameraOutline
+      cameraOutline,
+      shieldCheckmarkOutline,
+      peopleOutline
     });
   }
 
@@ -149,6 +158,42 @@ export class LoginPage implements OnInit {
     if (this.loginForm.valid) {
       this.isLoading = true;
 
+      const userEmail = this.loginForm.value.email.toLowerCase().trim();
+      const userPassword = this.loginForm.value.password;
+
+      // Check if admin email is entered
+      if (userEmail === 'rydesmartcampus@gmail.com') {
+        // Validate admin password
+        if (userPassword === 'rydes@6197') {
+          // Admin login successful
+          const adminData = {
+            name: 'Admin',
+            email: userEmail,
+            role: 'admin',
+            loginType: 'admin',
+            id: 'admin_1'
+          };
+          localStorage.setItem('userData', JSON.stringify(adminData));
+          localStorage.setItem('isAdmin', 'true');
+          
+          // Track admin login
+          this.adminService.trackUserLogin('admin_1', 'Admin', userEmail);
+          
+          setTimeout(() => {
+            this.isLoading = false;
+            this.showToast('Admin login successful! 🎉', 'success');
+            this.router.navigate(['/admin']);
+          }, 2000);
+          return;
+        } else {
+          // Wrong password for admin email
+          this.isLoading = false;
+          this.showToast('Invalid Credentials', 'danger');
+          return;
+        }
+      }
+
+      // Rider login for all other emails
       const existingUser = localStorage.getItem('userData');
       let existingPhoto = null;
       if (existingUser) {
@@ -160,13 +205,23 @@ export class LoginPage implements OnInit {
         }
       }
 
+      const userId = `user_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+      const userName = this.loginForm.value.name || this.loginForm.value.email.split('@')[0] || 'User';
+      
       const userData = {
-        name: this.loginForm.value.name || this.loginForm.value.email.split('@')[0] || 'User',
+        id: userId,
+        name: userName,
         email: this.loginForm.value.email,
         photo: existingPhoto,
-        avatar: existingPhoto
+        avatar: existingPhoto,
+        role: 'rider',
+        loginType: 'rider'
       };
       localStorage.setItem('userData', JSON.stringify(userData));
+      localStorage.setItem('isAdmin', 'false');
+      
+      // Track user login
+      this.adminService.trackUserLogin(userId, userName, this.loginForm.value.email);
 
       const statsKey = `userStats_${userData.email}`;
       const existingStats = localStorage.getItem(statsKey);
@@ -180,6 +235,11 @@ export class LoginPage implements OnInit {
         localStorage.setItem(statsKey, JSON.stringify(defaultStats));
         localStorage.setItem('userStats', JSON.stringify(defaultStats));
       }
+
+      // Send welcome email
+      this.emailService.sendWelcomeEmail(userData.email, userData.name).catch(err => {
+        console.error('Error sending welcome email:', err);
+      });
 
       setTimeout(() => {
         this.isLoading = false;
@@ -195,14 +255,24 @@ export class LoginPage implements OnInit {
     if (this.registerForm.valid) {
       this.isLoading = true;
 
+      const userId = `user_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+      const userName = this.registerForm.value.name || 'User';
+      
       const userData = {
-        name: this.registerForm.value.name || 'User',
+        id: userId,
+        name: userName,
         email: this.registerForm.value.email,
         phone: this.registerForm.value.phone,
         photo: this.selectedPhoto || null,
-        avatar: this.selectedPhoto || null
+        avatar: this.selectedPhoto || null,
+        role: 'rider',
+        loginType: 'rider'
       };
+      
+      // Track user registration/login
+      this.adminService.trackUserLogin(userId, userName, this.registerForm.value.email);
       localStorage.setItem('userData', JSON.stringify(userData));
+      localStorage.setItem('isAdmin', 'false');
 
       const statsKey = `userStats_${userData.email}`;
       const defaultStats = {
@@ -213,6 +283,11 @@ export class LoginPage implements OnInit {
       };
       localStorage.setItem(statsKey, JSON.stringify(defaultStats));
       localStorage.setItem('userStats', JSON.stringify(defaultStats));
+
+      // Send welcome email
+      this.emailService.sendWelcomeEmail(userData.email, userData.name).catch(err => {
+        console.error('Error sending welcome email:', err);
+      });
 
       setTimeout(() => {
         this.isLoading = false;
@@ -227,12 +302,22 @@ export class LoginPage implements OnInit {
   async onSocialLogin(provider: string) {
     this.isLoading = true;
 
+    const userData = {
+      name: 'User',
+      email: `${provider.toLowerCase()}@example.com`,
+      role: 'rider',
+      loginType: 'rider'
+    };
+    localStorage.setItem('userData', JSON.stringify(userData));
+    localStorage.setItem('isAdmin', 'false');
+
     setTimeout(() => {
       this.isLoading = false;
       this.showToast(`Signed in with ${provider}!`, 'success');
       this.router.navigate(['/tabs/tab1']);
     }, 1500);
   }
+
 
   async showToast(message: string, color: string) {
     const toast = await this.toastController.create({

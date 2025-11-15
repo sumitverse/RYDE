@@ -3,6 +3,7 @@ import { ViewWillEnter } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import {
   IonContent,
   IonHeader,
@@ -34,8 +35,11 @@ import {
   addOutline,
   pinOutline,
   waterOutline,
-  speedometerOutline
+  speedometerOutline,
+  flashOutline
 } from 'ionicons/icons';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 interface WeatherLocation {
   name: string;
@@ -44,6 +48,8 @@ interface WeatherLocation {
   icon: string;
   humidity?: number;
   windSpeed?: number;
+  lat?: number;
+  lng?: number;
 }
 
 @Component({
@@ -88,9 +94,12 @@ export class WeatherPage implements OnInit, ViewWillEnter {
     { name: 'Jaipur', temp: 31, condition: 'sunny', icon: 'sunny-outline', humidity: 40, windSpeed: 16 }
   ];
 
+  private apiKey = '77403a8034684bd5df80c41671156d52';
+
   constructor(
     private router: Router,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private http: HttpClient
   ) {
     addIcons({
       arrowBackOutline,
@@ -104,7 +113,8 @@ export class WeatherPage implements OnInit, ViewWillEnter {
       addOutline,
       pinOutline,
       waterOutline,
-      speedometerOutline
+      speedometerOutline,
+      flashOutline
     });
   }
 
@@ -120,8 +130,19 @@ export class WeatherPage implements OnInit, ViewWillEnter {
     const saved = localStorage.getItem('selectedWeatherLocation');
     if (saved) {
       try {
-        this.savedLocation = JSON.parse(saved);
-        this.selectedLocation = this.savedLocation;
+        const parsedLocation = JSON.parse(saved) as WeatherLocation;
+        this.savedLocation = parsedLocation;
+        
+        // If saved location has coordinates, fetch real-time data
+        if (parsedLocation && parsedLocation.lat && parsedLocation.lng) {
+          this.fetchWeatherByCoordinates(parsedLocation.lat, parsedLocation.lng, parsedLocation.name);
+        } else if (parsedLocation && parsedLocation.name) {
+          // If no coordinates but has name, fetch by city name
+          this.fetchWeatherByCity(parsedLocation.name);
+        } else if (parsedLocation) {
+          // Use saved data as fallback
+          this.selectedLocation = parsedLocation;
+        }
       } catch (e) {
         console.error('Error loading saved location:', e);
       }
@@ -139,38 +160,155 @@ export class WeatherPage implements OnInit, ViewWillEnter {
     }
 
     this.isLoading = true;
+    const searchQuery = this.searchQuery.trim();
 
-    setTimeout(() => {
-      const searchTerm = this.searchQuery.toLowerCase().trim();
+    // First, try to find in popular locations
+    const found = this.popularLocations.find(loc =>
+      loc.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
-      const found = this.popularLocations.find(loc =>
-        loc.name.toLowerCase().includes(searchTerm)
-      );
+    if (found) {
+      // If found in popular locations, fetch real weather data
+      this.fetchWeatherByCity(found.name);
+    } else {
+      // Search using OpenWeatherMap API by city name
+      this.fetchWeatherByCity(searchQuery);
+    }
+  }
 
-      if (found) {
-        this.selectedLocation = { ...found };
-      } else {
-        const conditions = ['sunny', 'cloudy', 'rainy', 'partly-sunny'];
-        const icons = ['sunny-outline', 'cloud-outline', 'rainy-outline', 'partly-sunny-outline'];
-        const randomIndex = Math.floor(Math.random() * conditions.length);
-
-        this.selectedLocation = {
-          name: this.searchQuery,
-          temp: Math.floor(Math.random() * 15) + 20,
-          condition: conditions[randomIndex],
-          icon: icons[randomIndex],
-          humidity: Math.floor(Math.random() * 40) + 40,
-          windSpeed: Math.floor(Math.random() * 15) + 5
-        };
+  fetchWeatherByCity(cityName: string) {
+    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(cityName)}&appid=${this.apiKey}&units=metric`;
+    
+    this.http.get<any>(weatherUrl).pipe(
+      catchError(error => {
+        console.error('Error fetching weather data:', error);
+        this.isLoading = false;
+        this.showToast('Location not found. Please try a different city name.', 'danger');
+        return of(null);
+      })
+    ).subscribe({
+      next: (data) => {
+        if (data) {
+          this.parseWeatherData(data);
+          this.isLoading = false;
+          this.searchQuery = '';
+        }
       }
+    });
+  }
 
-      this.isLoading = false;
-      this.searchQuery = '';
-    }, 1000);
+  fetchWeatherByCoordinates(lat: number, lng: number, cityName: string) {
+    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${this.apiKey}&units=metric`;
+    
+    this.http.get<any>(weatherUrl).pipe(
+      catchError(error => {
+        console.error('Error fetching weather data:', error);
+        this.showToast('Unable to fetch weather data.', 'warning');
+        return of(null);
+      })
+    ).subscribe({
+      next: (data) => {
+        if (data) {
+          // Override city name with provided name
+          if (cityName) {
+            data.name = cityName;
+          }
+          this.parseWeatherData(data);
+        }
+      }
+    });
+  }
+
+  parseWeatherData(data: any) {
+    if (data && data.main && data.weather && data.weather.length > 0) {
+      const temp = Math.round(data.main.temp);
+      const humidity = data.main.humidity || 0;
+      const windSpeed = data.wind?.speed ? Math.round(data.wind.speed * 3.6) : 0; // Convert m/s to km/h
+      const weatherId = data.weather[0].id;
+      const weatherMain = data.weather[0].main;
+      const weatherDescription = data.weather[0].description;
+
+      // Map weather ID to condition and icon
+      const { condition, icon } = this.getWeatherCondition(weatherId, weatherMain);
+
+      this.selectedLocation = {
+        name: data.name || 'Unknown',
+        temp: temp,
+        condition: condition,
+        icon: icon,
+        humidity: humidity,
+        windSpeed: windSpeed,
+        lat: data.coord?.lat,
+        lng: data.coord?.lon
+      };
+    }
+  }
+
+  getWeatherCondition(weatherId: number, weatherMain: string): { condition: string; icon: string } {
+    // OpenWeatherMap weather ID mapping
+    // Weather IDs: https://openweathermap.org/weather-conditions
+    
+    // Clear sky
+    if (weatherId === 800) {
+      return { condition: 'clear', icon: 'sunny-outline' };
+    }
+    // Clouds
+    else if (weatherId === 801 || weatherId === 802) {
+      return { condition: 'partly cloudy', icon: 'cloud-outline' };
+    }
+    else if (weatherId === 803 || weatherId === 804) {
+      return { condition: 'cloudy', icon: 'cloud-outline' };
+    }
+    // Thunderstorm
+    else if (weatherId >= 200 && weatherId < 300) {
+      return { condition: 'thunderstorm', icon: 'flash-outline' };
+    }
+    // Drizzle
+    else if (weatherId >= 300 && weatherId < 400) {
+      return { condition: 'drizzle', icon: 'cloud-outline' };
+    }
+    // Rain
+    else if (weatherId >= 500 && weatherId < 600) {
+      if (weatherId === 500 || weatherId === 501) {
+        return { condition: 'rainy', icon: 'flash-outline' };
+      } else {
+        return { condition: 'heavy rain', icon: 'flash-outline' };
+      }
+    }
+    // Snow
+    else if (weatherId >= 600 && weatherId < 700) {
+      return { condition: 'snowy', icon: 'cloud-outline' };
+    }
+    // Atmosphere (mist, fog, etc.)
+    else if (weatherId >= 700 && weatherId < 800) {
+      return { condition: 'foggy', icon: 'cloud-outline' };
+    }
+    // Fallback based on main condition
+    else {
+      const mainLower = weatherMain.toLowerCase();
+      if (mainLower.includes('clear')) {
+        return { condition: 'clear', icon: 'sunny-outline' };
+      } else if (mainLower.includes('cloud')) {
+        return { condition: 'cloudy', icon: 'cloud-outline' };
+      } else if (mainLower.includes('rain')) {
+        return { condition: 'rainy', icon: 'flash-outline' };
+      } else if (mainLower.includes('snow')) {
+        return { condition: 'snowy', icon: 'cloud-outline' };
+      } else if (mainLower.includes('thunderstorm')) {
+        return { condition: 'thunderstorm', icon: 'flash-outline' };
+      } else if (mainLower.includes('mist') || mainLower.includes('fog')) {
+        return { condition: 'foggy', icon: 'cloud-outline' };
+      } else {
+        // Default to cloudy
+        return { condition: 'cloudy', icon: 'cloud-outline' };
+      }
+    }
   }
 
   selectLocation(location: WeatherLocation) {
-    this.selectedLocation = { ...location };
+    // Fetch real-time weather data for the selected popular location
+    this.isLoading = true;
+    this.fetchWeatherByCity(location.name);
   }
 
   saveLocation() {
@@ -179,7 +317,14 @@ export class WeatherPage implements OnInit, ViewWillEnter {
       return;
     }
 
-    localStorage.setItem('selectedWeatherLocation', JSON.stringify(this.selectedLocation));
+    // Save location with coordinates for future real-time data fetching
+    const locationToSave = {
+      ...this.selectedLocation,
+      lat: this.selectedLocation.lat,
+      lng: this.selectedLocation.lng
+    };
+    
+    localStorage.setItem('selectedWeatherLocation', JSON.stringify(locationToSave));
     this.savedLocation = { ...this.selectedLocation };
     this.showToast(`${this.selectedLocation.name} set as default location!`, 'success');
 
@@ -200,17 +345,19 @@ export class WeatherPage implements OnInit, ViewWillEnter {
   }
 
   getConditionColor(condition: string): string {
-    switch (condition) {
-      case 'sunny':
-        return 'warning';
-      case 'cloudy':
-        return 'medium';
-      case 'rainy':
-        return 'primary';
-      case 'partly-sunny':
-        return 'tertiary';
-      default:
-        return 'medium';
+    const conditionLower = condition.toLowerCase();
+    if (conditionLower.includes('clear') || conditionLower.includes('sunny')) {
+      return 'warning';
+    } else if (conditionLower.includes('cloudy') || conditionLower.includes('cloud')) {
+      return 'medium';
+    } else if (conditionLower.includes('rain') || conditionLower.includes('drizzle')) {
+      return 'primary';
+    } else if (conditionLower.includes('thunderstorm')) {
+      return 'danger';
+    } else if (conditionLower.includes('snow')) {
+      return 'tertiary';
+    } else {
+      return 'medium';
     }
   }
 

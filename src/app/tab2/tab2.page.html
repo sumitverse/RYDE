@@ -50,6 +50,12 @@
       <ion-icon name="bicycle-outline"></ion-icon>
       <span>{{ filteredCycles.length }} Cycles Available</span>
     </div>
+
+    <!-- Route Loading Indicator -->
+    <div class="route-loading-indicator" *ngIf="isRouteLoading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <span>Calculating route...</span>
+    </div>
   </div>
 
   
@@ -86,10 +92,10 @@
   </div>
 
   
-  <div class="cycle-list-container" [class.show]="showCycleList || selectedCycle">
+  <div class="cycle-list-container" [class.show]="showCycleList">
     <div class="cycle-list-header">
       <h3>Available Cycles</h3>
-      <ion-button fill="clear" size="small" (click)="showCycleList = false; selectedCycle = null">
+      <ion-button fill="clear" size="small" (click)="closeCycleList()">
         <ion-icon name="close-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </div>

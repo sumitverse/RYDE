@@ -294,6 +294,16 @@
               <ion-icon name="checkmark-circle-outline"></ion-icon>
               Nearby
             </div>
+            <!-- Maintenance Status Badge -->
+            <div class="cycle-maintenance-badge" *ngIf="cycle.status === 'maintenance'">
+              <ion-icon name="construct-outline"></ion-icon>
+              Under Maintenance
+            </div>
+            <!-- Booked Status Badge -->
+            <div class="cycle-booked-badge" *ngIf="cycle.status === 'booked'">
+              <ion-icon name="time-outline"></ion-icon>
+              Booked
+            </div>
           </div>
           <div class="cycle-info">
             <div class="cycle-header">
@@ -324,14 +334,26 @@
                 class="cycle-progress">
               </ion-progress-bar>
             </div>
+            <!-- Maintenance Message -->
+            <div class="maintenance-message" *ngIf="cycle.status === 'maintenance'">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              <span>This cycle is currently under maintenance and cannot be booked.</span>
+            </div>
+            <!-- Booked Message -->
+            <div class="booked-message" *ngIf="cycle.status === 'booked'">
+              <ion-icon name="time-outline"></ion-icon>
+              <span>This cycle is currently booked by another user.</span>
+            </div>
             <ion-button
               expand="block"
-              color="primary"
+              [color]="cycle.status === 'maintenance' || cycle.status === 'booked' ? 'medium' : 'primary'"
               (click)="bookCycle(cycle)"
               class="book-btn"
-              [disabled]="!!activeRide">
+              [disabled]="!!activeRide || cycle.status === 'maintenance' || cycle.status === 'booked'">
               <ion-icon name="bicycle-outline" slot="start"></ion-icon>
-              Book Now
+              <span *ngIf="cycle.status === 'maintenance'">Under Maintenance</span>
+              <span *ngIf="cycle.status === 'booked'">Already Booked</span>
+              <span *ngIf="cycle.status !== 'maintenance' && cycle.status !== 'booked'">Book Now</span>
             </ion-button>
           </div>
         </div>

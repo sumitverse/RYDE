@@ -1,0 +1,231 @@
+<ion-header [translucent]="true" class="add-cycle-header">
+  <ion-toolbar class="add-cycle-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin/cycles" (click)="confirmCancel()"></ion-back-button>
+    </ion-buttons>
+    
+    <ion-title>{{ isEditMode ? 'Edit Cycle' : 'Add New Cycle' }}</ion-title>
+    
+    <ion-buttons slot="end">
+      <ion-button (click)="saveCycle()" color="primary" [disabled]="isLoading">
+        <ion-icon name="save-outline" slot="start"></ion-icon>
+        {{ isEditMode ? 'Update' : 'Save' }}
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="add-cycle-content">
+  <div class="form-container">
+    
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner></ion-spinner>
+      <p>Loading cycle data...</p>
+    </div>
+
+    <!-- Cycle Form -->
+    <div *ngIf="!isLoading" class="form-content">
+      
+      <!-- Image Preview Section -->
+      <ion-card class="image-preview-card">
+        <ion-card-header>
+          <ion-card-title>
+            <ion-icon name="image-outline"></ion-icon>
+            Cycle Image
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="image-section">
+            <div *ngIf="imagePreview" class="image-preview">
+              <img [src]="imagePreview" alt="Cycle preview" (error)="imagePreview = null">
+              <ion-button fill="clear" color="danger" (click)="clearImage()" class="remove-image-btn">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
+            <div *ngIf="!imagePreview" class="no-image">
+              <ion-icon name="camera-outline"></ion-icon>
+              <p>No image selected</p>
+            </div>
+          </div>
+          
+          <ion-item class="image-url-input">
+            <ion-label position="stacked">Image URL</ion-label>
+            <ion-input 
+              [(ngModel)]="cycleForm.thumbnail" 
+              placeholder="Enter image URL or select from below"
+              (ionInput)="onImageUrlChange()">
+            </ion-input>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Predefined Images -->
+      <ion-card class="predefined-images-card">
+        <ion-card-header>
+          <ion-card-title>Quick Select Images</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="predefined-images-grid">
+            <div 
+              *ngFor="let img of predefinedImages" 
+              class="predefined-image-item"
+              (click)="selectPredefinedImage(img)"
+              [class.selected]="cycleForm.thumbnail === img">
+              <img [src]="img" alt="Cycle" (error)="$event.target.style.display='none'">
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Basic Information -->
+      <ion-card class="form-card">
+        <ion-card-header>
+          <ion-card-title>
+            <ion-icon name="bicycle-outline"></ion-icon>
+            Basic Information
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item>
+            <ion-label position="stacked">Cycle Title *</ion-label>
+            <ion-input 
+              [(ngModel)]="cycleForm.title" 
+              placeholder="e.g., Electric Bike Pro"
+              required>
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Price (₹/hr) *</ion-label>
+            <ion-input 
+              type="number" 
+              [(ngModel)]="cycleForm.price" 
+              placeholder="50"
+              min="1"
+              required>
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Location *</ion-label>
+            <ion-input 
+              [(ngModel)]="cycleForm.location" 
+              placeholder="e.g., Block A, Parking Lot 1"
+              required>
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Description</ion-label>
+            <ion-textarea 
+              [(ngModel)]="cycleForm.description" 
+              placeholder="Add a description for this cycle..."
+              rows="3">
+            </ion-textarea>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Technical Details -->
+      <ion-card class="form-card">
+        <ion-card-header>
+          <ion-card-title>
+            <ion-icon name="flash-outline"></ion-icon>
+            Technical Details
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item>
+            <ion-label position="stacked">Battery Level (%)</ion-label>
+            <ion-input 
+              type="number" 
+              [(ngModel)]="cycleForm.battery" 
+              min="0" 
+              max="100"
+              placeholder="100">
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Distance (km)</ion-label>
+            <ion-input 
+              type="number" 
+              [(ngModel)]="cycleForm.distance" 
+              step="0.1"
+              min="0"
+              placeholder="0.5">
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Condition</ion-label>
+            <ion-select [(ngModel)]="cycleForm.condition">
+              <ion-select-option value="excellent">Excellent</ion-select-option>
+              <ion-select-option value="good">Good</ion-select-option>
+              <ion-select-option value="fair">Fair</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Status -->
+      <ion-card class="form-card">
+        <ion-card-header>
+          <ion-card-title>
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            Status
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item>
+            <ion-label position="stacked">Cycle Status</ion-label>
+            <ion-select [(ngModel)]="cycleForm.status">
+              <ion-select-option value="available">
+                <ion-chip color="success">Available</ion-chip>
+              </ion-select-option>
+              <ion-select-option value="booked">
+                <ion-chip color="warning">Booked</ion-chip>
+              </ion-select-option>
+              <ion-select-option value="maintenance">
+                <ion-chip color="danger">Maintenance</ion-chip>
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+          
+          <div class="status-preview">
+            <p>Current Status:</p>
+            <ion-chip [color]="getStatusColor(cycleForm.status)">
+              {{ cycleForm.status }}
+            </ion-chip>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <ion-button 
+          expand="block" 
+          (click)="saveCycle()" 
+          color="primary"
+          size="large"
+          [disabled]="isLoading">
+          <ion-icon name="save-outline" slot="start"></ion-icon>
+          {{ isEditMode ? 'Update Cycle' : 'Add Cycle' }}
+        </ion-button>
+        
+        <ion-button 
+          expand="block" 
+          (click)="confirmCancel()" 
+          fill="outline"
+          size="large">
+          <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+          Cancel
+        </ion-button>
+      </div>
+
+    </div>
+
+  </div>
+</ion-content>
+

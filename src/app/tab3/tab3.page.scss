@@ -12,8 +12,187 @@
   background: #000000;
   position: relative;
   padding: 2rem;
+  gap: 2rem;
 }
 
+// QR Code Display (Initial State)
+.qr-code-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: fadeIn 0.5s ease-in;
+}
+
+.qr-code-box {
+  width: 200px;
+  height: 200px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.qr-pattern {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: 2px;
+}
+
+.qr-square {
+  background: #000000;
+  border-radius: 2px;
+}
+
+.qr-top-left {
+  grid-column: 1 / 4;
+  grid-row: 1 / 4;
+  border: 3px solid #000;
+  border-radius: 4px;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40%;
+    height: 40%;
+    background: #000;
+    border-radius: 2px;
+  }
+}
+
+.qr-top-right {
+  grid-column: 5 / 8;
+  grid-row: 1 / 4;
+  border: 3px solid #000;
+  border-radius: 4px;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40%;
+    height: 40%;
+    background: #000;
+    border-radius: 2px;
+  }
+}
+
+.qr-bottom-left {
+  grid-column: 1 / 4;
+  grid-row: 5 / 8;
+  border: 3px solid #000;
+  border-radius: 4px;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40%;
+    height: 40%;
+    background: #000;
+    border-radius: 2px;
+  }
+}
+
+.qr-dots {
+  grid-column: 4 / 8;
+  grid-row: 4 / 8;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 2px;
+  
+  &::before {
+    content: '';
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    background: #000;
+    border-radius: 1px;
+  }
+  &::after {
+    content: '';
+    grid-column: 3 / 4;
+    grid-row: 3 / 4;
+    background: #000;
+    border-radius: 1px;
+  }
+}
+
+.qr-label {
+  margin-top: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+}
+
+// QR Code Image Container (shown after success)
+.qr-code-image-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: fadeInUp 0.6s ease-out 0.3s both;
+  margin-top: 1rem;
+}
+
+.qr-image-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.qr-dummy-image {
+  width: 200px;
+  height: 200px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+  border: 2px solid rgba(16, 185, 129, 0.3);
+  animation: imagePop 0.5s ease-out 0.5s both;
+}
+
+.qr-image-label {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  margin: 0;
+}
+
+@keyframes imagePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+// Scanning Frame
 .scanning-frame {
   width: 280px;
   height: 280px;
@@ -24,6 +203,51 @@
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.05);
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+  animation: frameAppear 0.4s ease-out;
+  opacity: 1;
+  transform: scale(1);
+  
+  &.scanning {
+    border-color: #10B981;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5), 0 0 30px rgba(16, 185, 129, 0.5);
+    animation: frameAppear 0.4s ease-out, pulse 1.5s ease-in-out infinite 0.4s;
+  }
+  
+  &.success {
+    border-color: #10B981;
+    background: rgba(16, 185, 129, 0.1);
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5), 0 0 40px rgba(16, 185, 129, 0.8);
+    animation: frameAppear 0.4s ease-out, successGlow 1s ease-in-out;
+  }
+}
+
+@keyframes frameAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes successGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5), 0 0 40px rgba(16, 185, 129, 0.8);
+  }
+  50% {
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5), 0 0 60px rgba(16, 185, 129, 1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5), 0 0 30px rgba(16, 185, 129, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5), 0 0 50px rgba(16, 185, 129, 0.8);
+  }
 }
 
 .corner {
@@ -32,6 +256,22 @@
   height: 24px;
   border: 3px solid #10B981;
   z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.scanning-frame.scanning .corner {
+  animation: cornerPulse 1s ease-in-out infinite;
+}
+
+@keyframes cornerPulse {
+  0%, 100% {
+    border-color: #10B981;
+    box-shadow: 0 0 5px rgba(16, 185, 129, 0.5);
+  }
+  50% {
+    border-color: #34D399;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 1);
+  }
 }
 
 .corner-top-left {
@@ -96,15 +336,135 @@
   }
 }
 
+// Success Checkmark
+.success-checkmark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  animation: checkmarkPop 0.5s ease-out;
+  
+  ion-icon {
+    font-size: 80px;
+    color: #10B981;
+    filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.8));
+    animation: checkmarkScale 0.6s ease-out;
+  }
+  
+  p {
+    margin-top: 1rem;
+    color: #10B981;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    animation: fadeInUp 0.5s ease-out 0.2s both;
+  }
+}
+
+@keyframes checkmarkPop {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes checkmarkScale {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .instruction-text {
-  margin-top: 3rem;
   text-align: center;
   color: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s ease;
 
   p {
     font-size: 16px;
     margin: 0;
     font-weight: 400;
+  }
+  
+  &.scanning {
+    color: #10B981;
+    
+    p {
+      font-weight: 500;
+      animation: textPulse 1.5s ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes textPulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+// Scan Button
+.scan-button {
+  margin-top: 1rem;
+  --background: #10B981;
+  --background-activated: #059669;
+  --color: #ffffff;
+  --border-radius: 12px;
+  --padding-start: 2rem;
+  --padding-end: 2rem;
+  --padding-top: 1rem;
+  --padding-bottom: 1rem;
+  font-weight: 600;
+  font-size: 16px;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
 }
 
@@ -113,8 +473,23 @@
     width: 240px;
     height: 240px;
   }
+  
+  .qr-code-box {
+    width: 160px;
+    height: 160px;
+  }
 
   .instruction-text p {
     font-size: 14px;
+  }
+  
+  .success-checkmark {
+    ion-icon {
+      font-size: 60px;
+    }
+    
+    p {
+      font-size: 16px;
+    }
   }
 }

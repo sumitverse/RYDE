@@ -8,21 +8,42 @@
 
 <ion-content [fullscreen]="true" class="qr-scanner-content">
   <div class="scanner-container">
-    
-    <div class="scanning-frame">
-      
+
+    <!-- Scanning Frame -->
+    <div class="scanning-frame"
+         [class.scanning]="scanningState === 'scanning'"
+         [class.success]="scanningState === 'success'">
+
       <div class="corner corner-top-left"></div>
       <div class="corner corner-top-right"></div>
       <div class="corner corner-bottom-left"></div>
       <div class="corner corner-bottom-right"></div>
-      
-      
-      <div class="scanning-line"></div>
+
+      <!-- Scanning Line Animation -->
+      <div class="scanning-line" *ngIf="scanningState === 'scanning'"></div>
+
+      <!-- Success Checkmark -->
+      <div class="success-checkmark" *ngIf="scanningState === 'success'">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        <p>QR Code Scanned!</p>
+      </div>
     </div>
-    
-    
-    <div class="instruction-text">
-      <p>Position QR code within the frame</p>
+
+    <!-- Instruction Text -->
+    <div class="instruction-text scanning" *ngIf="scanningState === 'scanning'">
+      <p>Scanning QR code...</p>
+    </div>
+
+    <!-- QR Code Image (shown after success) -->
+    <div class="qr-code-image-container" *ngIf="scanningState === 'success'">
+      <div class="qr-image-wrapper">
+        <img
+          src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=CycleRental-12345"
+          alt="Cycle Rental QR Code"
+          class="qr-dummy-image"
+          (error)="onQrImageError($event)">
+        <p class="qr-image-label">RYDE QR Code</p>
+      </div>
     </div>
   </div>
 </ion-content>

@@ -1,0 +1,466 @@
+<ion-header [translucent]="true" class="admin-header">
+  <ion-toolbar class="admin-toolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" class="back-btn">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    
+    <div class="header-content">
+      <div class="admin-logo">
+        <div class="logo-icon">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+        </div>
+        <div class="header-text">
+          <h1 class="header-title">Admin</h1>
+          <p class="header-subtitle">Manage your platform</p>
+        </div>
+      </div>
+    </div>
+    
+    <ion-buttons slot="end" class="header-actions">
+      <ion-button (click)="refreshData()" class="action-btn refresh-btn">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </ion-button>
+      <div class="admin-badge">
+        <ion-icon name="person-circle-outline"></ion-icon>
+        <span>Admin</span>
+      </div>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="admin-container">
+    
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner></ion-spinner>
+      <p>Loading data...</p>
+    </div>
+
+    <!-- Tab Selection -->
+    <ion-segment [(ngModel)]="selectedTab" (ionChange)="onTabChange($event)" class="admin-tabs">
+      <ion-segment-button value="dashboard">
+        <ion-icon name="stats-chart-outline"></ion-icon>
+        <ion-label>Dashboard</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="cycles">
+        <ion-icon name="bicycle-outline"></ion-icon>
+        <ion-label>Cycles</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="users">
+        <ion-icon name="people-outline"></ion-icon>
+        <ion-label>Users</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="bookings">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <ion-label>Bookings</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="transactions">
+        <ion-icon name="wallet-outline"></ion-icon>
+        <ion-label>Transactions</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="offers">
+        <ion-icon name="ticket-outline"></ion-icon>
+        <ion-label>Offers</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <!-- Dashboard Tab -->
+    <div *ngIf="selectedTab === 'dashboard' && !isLoading" class="tab-content">
+      <div class="stats-grid">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+              <ion-icon name="bicycle-outline"></ion-icon>
+            </div>
+            <h3>{{ dashboardStats.totalCycles }}</h3>
+            <p>Total Cycles</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <div class="stat-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+            </div>
+            <h3>{{ dashboardStats.availableCycles }}</h3>
+            <p>Available</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+              <ion-icon name="time-outline"></ion-icon>
+            </div>
+            <h3>{{ dashboardStats.bookedCycles }}</h3>
+            <p>Booked</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+              <ion-icon name="people-outline"></ion-icon>
+            </div>
+            <h3>{{ dashboardStats.totalUsers }}</h3>
+            <p>Total Users</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <div class="stat-icon" style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);">
+              <ion-icon name="calendar-outline"></ion-icon>
+            </div>
+            <h3>{{ dashboardStats.activeRides }}</h3>
+            <p>Active Rides</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <div class="stat-icon" style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);">
+              <ion-icon name="cash-outline"></ion-icon>
+            </div>
+            <h3>₹{{ dashboardStats.totalRevenue.toFixed(2) }}</h3>
+            <p>Total Revenue</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <div class="stat-icon" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);">
+              <ion-icon name="trending-up-outline"></ion-icon>
+            </div>
+            <h3>₹{{ dashboardStats.todayRevenue.toFixed(2) }}</h3>
+            <p>Today's Revenue</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <div class="stat-icon" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">
+              <ion-icon name="stats-chart-outline"></ion-icon>
+            </div>
+            <h3>{{ dashboardStats.totalBookings }}</h3>
+            <p>Total Bookings</p>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- Cycles Tab -->
+    <div *ngIf="selectedTab === 'cycles' && !isLoading" class="tab-content">
+      <div class="tab-header">
+        <ion-searchbar
+          [(ngModel)]="searchQuery"
+          (ionInput)="onSearchChange($event)"
+          placeholder="Search cycles..."
+          debounce="300">
+        </ion-searchbar>
+        <ion-button (click)="openCycleModal()" color="primary">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          Add Cycle
+        </ion-button>
+      </div>
+
+      <ion-list>
+        <ion-item *ngFor="let cycle of filteredCycles" class="cycle-item">
+          <ion-avatar slot="start">
+            <img [src]="cycle.thumbnail" [alt]="cycle.title" onerror="this.src='https://via.placeholder.com/150'">
+          </ion-avatar>
+          <ion-label>
+            <h2>{{ cycle.title }}</h2>
+            <p>
+              <ion-icon name="location-outline"></ion-icon>
+              {{ cycle.location }}
+            </p>
+            <p>
+              <ion-icon name="cash-outline"></ion-icon>
+              ₹{{ cycle.price }}/hr
+            </p>
+          </ion-label>
+          <div slot="end" class="item-actions">
+            <ion-chip [color]="getStatusColor(cycle.status)">
+              {{ cycle.status }}
+            </ion-chip>
+            <ion-button fill="clear" (click)="openCycleModal(cycle)">
+              <ion-icon name="create-outline"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" color="danger" (click)="deleteCycle(cycle)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </ion-item>
+      </ion-list>
+    </div>
+
+    <!-- Users Tab -->
+    <div *ngIf="selectedTab === 'users' && !isLoading" class="tab-content">
+      <div class="tab-header">
+        <ion-searchbar
+          [(ngModel)]="searchQuery"
+          (ionInput)="onSearchChange($event)"
+          placeholder="Search users..."
+          debounce="300">
+        </ion-searchbar>
+      </div>
+
+      <ion-list>
+        <ion-item *ngFor="let user of filteredUsers" class="user-item">
+          <ion-avatar slot="start">
+            <img [src]="user.avatar || 'https://via.placeholder.com/150'" [alt]="user.name">
+          </ion-avatar>
+          <ion-label>
+            <h2>{{ user.name }}</h2>
+            <p>{{ user.email }}</p>
+            <p>{{ user.phone }}</p>
+            <p>Rides: {{ user.totalRides }} | Balance: ₹{{ user.walletBalance }}</p>
+          </ion-label>
+          <div slot="end" class="item-actions">
+            <ion-chip [color]="getStatusColor(user.status)">
+              {{ user.status }}
+            </ion-chip>
+            <ion-button fill="clear" (click)="toggleUserStatus(user)">
+              <ion-icon [name]="user.status === 'active' ? 'checkmark-circle-outline' : 'close-circle-outline'"></ion-icon>
+            </ion-button>
+          </div>
+        </ion-item>
+        <div *ngIf="filteredUsers.length === 0" class="empty-state">
+          <ion-icon name="people-outline"></ion-icon>
+          <p>No users found</p>
+        </div>
+      </ion-list>
+    </div>
+
+    <!-- Bookings Tab -->
+    <div *ngIf="selectedTab === 'bookings' && !isLoading" class="tab-content">
+      <div class="tab-header">
+        <ion-searchbar
+          [(ngModel)]="searchQuery"
+          (ionInput)="onSearchChange($event)"
+          placeholder="Search bookings..."
+          debounce="300">
+        </ion-searchbar>
+      </div>
+
+      <ion-list>
+        <ion-item *ngFor="let booking of filteredBookings" class="booking-item">
+          <ion-label>
+            <h2>{{ booking.cycleTitle }}</h2>
+            <p>User: {{ booking.userName }}</p>
+            <p>
+              <ion-icon name="time-outline"></ion-icon>
+              {{ booking.startTime | date:'short' }}
+            </p>
+            <p>
+              <ion-icon name="cash-outline"></ion-icon>
+              ₹{{ booking.fare }}
+            </p>
+          </ion-label>
+          <div slot="end" class="item-actions">
+            <ion-chip [color]="getStatusColor(booking.status)">
+              {{ booking.status }}
+            </ion-chip>
+            <ion-button *ngIf="booking.status === 'active'" fill="clear" color="danger" (click)="cancelBooking(booking)">
+              <ion-icon name="close-circle-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </ion-item>
+        <div *ngIf="filteredBookings.length === 0" class="empty-state">
+          <ion-icon name="calendar-outline"></ion-icon>
+          <p>No bookings found</p>
+        </div>
+      </ion-list>
+    </div>
+
+    <!-- Transactions Tab -->
+    <div *ngIf="selectedTab === 'transactions' && !isLoading" class="tab-content">
+      <div class="tab-header">
+        <ion-searchbar
+          [(ngModel)]="searchQuery"
+          (ionInput)="onSearchChange($event)"
+          placeholder="Search transactions..."
+          debounce="300">
+        </ion-searchbar>
+      </div>
+
+      <ion-list>
+        <ion-item *ngFor="let transaction of filteredTransactions" class="transaction-item">
+          <ion-label>
+            <h2>{{ transaction.description }}</h2>
+            <p>User: {{ transaction.userName }}</p>
+            <p>{{ transaction.date | date:'short' }}</p>
+          </ion-label>
+          <div slot="end" class="item-actions">
+            <h3 [class]="transaction.type === 'credit' ? 'credit' : 'debit'">
+              {{ transaction.type === 'credit' ? '+' : '-' }}₹{{ transaction.amount }}
+            </h3>
+            <ion-chip [color]="getStatusColor(transaction.status)">
+              {{ transaction.status }}
+            </ion-chip>
+          </div>
+        </ion-item>
+      </ion-list>
+    </div>
+
+    <!-- Offers Tab -->
+    <div *ngIf="selectedTab === 'offers' && !isLoading" class="tab-content">
+      <div class="tab-header">
+        <ion-button (click)="openOfferModal()" color="primary">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          Add Offer
+        </ion-button>
+      </div>
+
+      <div class="offers-grid">
+        <ion-card *ngFor="let offer of offers" class="offer-card">
+          <img [src]="offer.image" [alt]="offer.title" onerror="this.src='https://via.placeholder.com/300'">
+          <ion-card-header>
+            <ion-card-title>{{ offer.title }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p>{{ offer.description }}</p>
+            <p *ngIf="offer.discount" class="discount">Discount: {{ offer.discount }}</p>
+            <p class="validity">
+              Valid: {{ offer.validFrom | date:'shortDate' }} - {{ offer.validTo | date:'shortDate' }}
+            </p>
+            <div class="offer-actions">
+              <ion-chip [color]="getStatusColor(offer.status)">
+                {{ offer.status }}
+              </ion-chip>
+              <ion-button fill="clear" (click)="openOfferModal(offer)">
+                <ion-icon name="create-outline"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" color="danger" (click)="deleteOffer(offer)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+  </div>
+</ion-content>
+
+<!-- Cycle Modal -->
+<ion-modal [isOpen]="isCycleModalOpen" (willDismiss)="isCycleModalOpen = false">
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ editingCycle ? 'Edit Cycle' : 'Add Cycle' }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="isCycleModalOpen = false">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="modal-content">
+      <ion-list>
+        <ion-item>
+          <ion-label position="stacked">Title *</ion-label>
+          <ion-input [(ngModel)]="cycleForm.title" placeholder="Enter cycle title"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Price (₹/hr) *</ion-label>
+          <ion-input type="number" [(ngModel)]="cycleForm.price" placeholder="Enter price"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Thumbnail URL</ion-label>
+          <ion-input [(ngModel)]="cycleForm.thumbnail" placeholder="Enter image URL"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Battery (%)</ion-label>
+          <ion-input type="number" [(ngModel)]="cycleForm.battery" placeholder="Battery level"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Distance (km)</ion-label>
+          <ion-input type="number" [(ngModel)]="cycleForm.distance" placeholder="Distance"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Condition</ion-label>
+          <ion-select [(ngModel)]="cycleForm.condition">
+            <ion-select-option value="excellent">Excellent</ion-select-option>
+            <ion-select-option value="good">Good</ion-select-option>
+            <ion-select-option value="fair">Fair</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Location</ion-label>
+          <ion-input [(ngModel)]="cycleForm.location" placeholder="Enter location"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Status</ion-label>
+          <ion-select [(ngModel)]="cycleForm.status">
+            <ion-select-option value="available">Available</ion-select-option>
+            <ion-select-option value="booked">Booked</ion-select-option>
+            <ion-select-option value="maintenance">Maintenance</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-list>
+      <div class="modal-actions">
+        <ion-button expand="block" (click)="saveCycle()" color="primary">
+          {{ editingCycle ? 'Update' : 'Add' }} Cycle
+        </ion-button>
+      </div>
+    </ion-content>
+</ion-modal>
+
+<!-- Offer Modal -->
+<ion-modal [isOpen]="isOfferModalOpen" (willDismiss)="isOfferModalOpen = false">
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ editingOffer ? 'Edit Offer' : 'Add Offer' }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="isOfferModalOpen = false">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="modal-content">
+      <ion-list>
+        <ion-item>
+          <ion-label position="stacked">Title *</ion-label>
+          <ion-input [(ngModel)]="offerForm.title" placeholder="Enter offer title"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Description *</ion-label>
+          <ion-textarea [(ngModel)]="offerForm.description" placeholder="Enter description"></ion-textarea>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Image URL</ion-label>
+          <ion-input [(ngModel)]="offerForm.image" placeholder="Enter image URL"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Discount</ion-label>
+          <ion-input [(ngModel)]="offerForm.discount" placeholder="e.g., 20% off"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Valid From</ion-label>
+          <ion-input type="date" [(ngModel)]="offerForm.validFrom"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Valid To</ion-label>
+          <ion-input type="date" [(ngModel)]="offerForm.validTo"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Status</ion-label>
+          <ion-select [(ngModel)]="offerForm.status">
+            <ion-select-option value="active">Active</ion-select-option>
+            <ion-select-option value="inactive">Inactive</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-list>
+      <div class="modal-actions">
+        <ion-button expand="block" (click)="saveOffer()" color="primary">
+          {{ editingOffer ? 'Update' : 'Add' }} Offer
+        </ion-button>
+      </div>
+    </ion-content>
+</ion-modal>
+

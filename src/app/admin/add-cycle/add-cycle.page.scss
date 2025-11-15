@@ -1,0 +1,322 @@
+.add-cycle-header {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%);
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.12);
+  
+  ion-toolbar.add-cycle-toolbar {
+    --background: transparent;
+    --color: #10B981;
+    --min-height: 80px;
+    padding: 0.5rem 0;
+  }
+}
+
+.add-cycle-content {
+  --background: #F9FAFB;
+}
+
+.form-container {
+  padding: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  
+  ion-spinner {
+    margin-bottom: 1rem;
+  }
+  
+  p {
+    color: var(--ion-color-medium);
+  }
+}
+
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+// Image Preview Card
+.image-preview-card {
+  margin: 0;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  
+  ion-card-header {
+    padding: 1.5rem 1.5rem 1rem;
+    
+    ion-card-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--ion-color-dark);
+      
+      ion-icon {
+        font-size: 1.5rem;
+        color: var(--ion-color-primary);
+      }
+    }
+  }
+  
+  ion-card-content {
+    padding: 1rem 1.5rem 1.5rem;
+  }
+}
+
+.image-section {
+  margin-bottom: 1rem;
+  
+  .image-preview {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 1rem;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+      min-height: 200px;
+      background: var(--ion-color-light);
+    }
+    
+    .remove-image-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      --background: rgba(239, 68, 68, 0.9);
+      --color: white;
+      --border-radius: 50%;
+      width: 40px;
+      height: 40px;
+    }
+  }
+  
+  .no-image {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    background: var(--ion-color-light);
+    border-radius: 16px;
+    border: 2px dashed var(--ion-color-medium);
+    
+    ion-icon {
+      font-size: 4rem;
+      color: var(--ion-color-medium);
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    
+    p {
+      color: var(--ion-color-medium);
+      margin: 0;
+    }
+  }
+}
+
+.image-url-input {
+  --background: white;
+  --border-radius: 12px;
+  margin: 0;
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+}
+
+// Predefined Images Card
+.predefined-images-card {
+  margin: 0;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  
+  ion-card-header {
+    padding: 1.5rem 1.5rem 1rem;
+    
+    ion-card-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--ion-color-dark);
+    }
+  }
+  
+  ion-card-content {
+    padding: 1rem 1.5rem 1.5rem;
+  }
+}
+
+.predefined-images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 1rem;
+  
+  .predefined-image-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    
+    &:active {
+      transform: scale(0.95);
+    }
+    
+    &.selected {
+      border-color: var(--ion-color-primary);
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+    }
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    &:hover::after {
+      opacity: 1;
+    }
+  }
+}
+
+// Form Cards
+.form-card {
+  margin: 0;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  
+  ion-card-header {
+    padding: 1.5rem 1.5rem 1rem;
+    background: linear-gradient(135deg, #F0FDF4 0%, #FFFFFF 100%);
+    border-radius: 20px 20px 0 0;
+    
+    ion-card-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--ion-color-dark);
+      
+      ion-icon {
+        font-size: 1.5rem;
+        color: var(--ion-color-primary);
+      }
+    }
+  }
+  
+  ion-card-content {
+    padding: 1.5rem;
+    
+    ion-item {
+      --background: white;
+      --border-radius: 12px;
+      margin-bottom: 1rem;
+      --padding-start: 1rem;
+      --padding-end: 1rem;
+      --inner-padding-end: 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      ion-label {
+        font-weight: 600;
+        color: var(--ion-color-dark);
+        margin-bottom: 0.5rem;
+      }
+      
+      ion-input, ion-select, ion-textarea {
+        --padding-start: 0;
+        --padding-end: 0;
+      }
+    }
+  }
+}
+
+.status-preview {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--ion-color-light);
+  border-radius: 12px;
+  
+  p {
+    margin: 0;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+  }
+  
+  ion-chip {
+    margin: 0;
+    font-weight: 600;
+  }
+}
+
+// Action Buttons
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-bottom: 2rem;
+  
+  ion-button {
+    --border-radius: 16px;
+    height: 56px;
+    font-weight: 700;
+    font-size: 1.125rem;
+    margin: 0;
+    
+    ion-icon {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .form-container {
+    padding: 0.5rem;
+  }
+  
+  .predefined-images-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.75rem;
+  }
+  
+  .image-preview {
+    max-width: 100%;
+  }
+}
+

@@ -1,0 +1,273 @@
+<ion-header [translucent]="true" class="admin-header">
+  <ion-toolbar class="admin-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/login" class="back-button"></ion-back-button>
+    </ion-buttons>
+    
+    <div class="header-content">
+      <div class="admin-logo">
+        <div class="logo-icon">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+        </div>
+        <div class="header-text">
+          <h1 class="header-title">Admin Dashboard</h1>
+          <p class="header-subtitle">Welcome back! Here's your platform overview</p>
+        </div>
+      </div>
+    </div>
+    
+    <ion-buttons slot="end">
+      <ion-button (click)="loadStats()" fill="clear" class="refresh-btn">
+        <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="dashboard-content">
+  <div class="dashboard-container">
+    
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading dashboard statistics...</p>
+    </div>
+
+    <!-- Main Stats Grid -->
+    <div *ngIf="!isLoading" class="main-stats-section">
+      <div class="section-header">
+        <div class="header-info">
+          <h2 class="section-title">Overview Statistics</h2>
+          <p class="section-subtitle">Real-time platform metrics and insights</p>
+        </div>
+        <div class="last-updated">
+          <ion-icon name="time-outline"></ion-icon>
+          <span>Updated just now</span>
+        </div>
+      </div>
+
+      <div class="main-stats-grid">
+        
+        <!-- Total Cycles Card -->
+        <div class="stat-card stat-primary cycles-card" (click)="navigateTo('cycles')">
+          <div class="card-background"></div>
+          <div class="card-content">
+            <div class="stat-header">
+              <div class="stat-icon-wrapper">
+                <div class="stat-icon">
+                  <ion-icon name="bicycle-outline"></ion-icon>
+                </div>
+              </div>
+              <div class="stat-trend">
+                <ion-icon name="trending-up-outline"></ion-icon>
+              </div>
+            </div>
+            <div class="stat-body">
+              <div class="stat-value">{{ stats.totalCycles || 0 }}</div>
+              <div class="stat-label">Total Cycles</div>
+              <div class="stat-breakdown">
+                <div class="breakdown-item available">
+                  <span class="breakdown-dot"></span>
+                  <span class="breakdown-text">{{ stats.availableCycles || 0 }} Available</span>
+                </div>
+                <div class="breakdown-item booked">
+                  <span class="breakdown-dot"></span>
+                  <span class="breakdown-text">{{ stats.bookedCycles || 0 }} Booked</span>
+                </div>
+                <div class="breakdown-item maintenance" *ngIf="(stats.totalCycles || 0) - (stats.availableCycles || 0) - (stats.bookedCycles || 0) > 0">
+                  <span class="breakdown-dot"></span>
+                  <span class="breakdown-text">{{ (stats.totalCycles || 0) - (stats.availableCycles || 0) - (stats.bookedCycles || 0) }} Maintenance</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <span class="footer-text">View Details</span>
+              <ion-icon name="arrow-forward-outline"></ion-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Users Card -->
+        <div class="stat-card stat-secondary users-card" (click)="navigateTo('users')">
+          <div class="card-background"></div>
+          <div class="card-content">
+            <div class="stat-header">
+              <div class="stat-icon-wrapper">
+                <div class="stat-icon">
+                  <ion-icon name="people-outline"></ion-icon>
+                </div>
+              </div>
+              <div class="stat-trend">
+                <ion-icon name="trending-up-outline"></ion-icon>
+              </div>
+            </div>
+            <div class="stat-body">
+              <div class="stat-value">{{ stats.totalUsers || 0 }}</div>
+              <div class="stat-label">Total Users</div>
+              <div class="stat-breakdown">
+                <div class="breakdown-item">
+                  <span class="breakdown-text">{{ stats.totalLogins || 0 }} Total Logins</span>
+                </div>
+                <div class="breakdown-item active">
+                  <span class="breakdown-dot"></span>
+                  <span class="breakdown-text">{{ stats.activeSessions || 0 }} Active Sessions</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <span class="footer-text">Manage Users</span>
+              <ion-icon name="arrow-forward-outline"></ion-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revenue Card -->
+        <div class="stat-card stat-success revenue-card" (click)="navigateTo('transactions')">
+          <div class="card-background"></div>
+          <div class="card-content">
+            <div class="stat-header">
+              <div class="stat-icon-wrapper">
+                <div class="stat-icon">
+                  <ion-icon name="cash-outline"></ion-icon>
+                </div>
+              </div>
+              <div class="stat-trend">
+                <ion-icon name="trending-up-outline"></ion-icon>
+              </div>
+            </div>
+            <div class="stat-body">
+              <div class="stat-value">₹{{ formatCurrency(stats.totalRevenue || 0) }}</div>
+              <div class="stat-label">Total Revenue</div>
+              <div class="stat-breakdown">
+                <div class="breakdown-item highlight">
+                  <ion-icon name="calendar-outline"></ion-icon>
+                  <span class="breakdown-text">₹{{ formatCurrency(stats.todayRevenue || 0) }} Today</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <span class="footer-text">View Transactions</span>
+              <ion-icon name="arrow-forward-outline"></ion-icon>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Secondary Stats Grid -->
+    <div *ngIf="!isLoading" class="secondary-stats-section">
+      <div class="secondary-stats-grid">
+        
+        <!-- Transactions Card -->
+        <div class="mini-stat-card transactions-card" (click)="navigateTo('transactions')">
+          <div class="mini-icon-wrapper">
+            <ion-icon name="wallet-outline"></ion-icon>
+          </div>
+          <div class="mini-stat-content">
+            <div class="mini-value">{{ stats.totalTransactions || 0 }}</div>
+            <div class="mini-label">Transactions</div>
+            <div class="mini-detail">{{ stats.completedTransactions || 0 }} Completed</div>
+          </div>
+          <div class="mini-arrow">
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </div>
+        </div>
+
+        <!-- Today's Logins Card -->
+        <div class="mini-stat-card logins-card" (click)="navigateTo('users')">
+          <div class="mini-icon-wrapper">
+            <ion-icon name="log-in-outline"></ion-icon>
+          </div>
+          <div class="mini-stat-content">
+            <div class="mini-value">{{ stats.todayLogins || 0 }}</div>
+            <div class="mini-label">Today's Logins</div>
+            <div class="mini-detail">{{ stats.totalLogins || 0 }} Total</div>
+          </div>
+          <div class="mini-arrow">
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </div>
+        </div>
+
+        <!-- Active Sessions Card -->
+        <div class="mini-stat-card sessions-card">
+          <div class="mini-icon-wrapper">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+          </div>
+          <div class="mini-stat-content">
+            <div class="mini-value">{{ stats.activeSessions || 0 }}</div>
+            <div class="mini-label">Active Sessions</div>
+            <div class="mini-detail online-indicator">
+              <span class="pulse-dot"></span>
+              Online Now
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Quick Actions Section -->
+    <div *ngIf="!isLoading" class="quick-actions-section">
+      <div class="section-header">
+        <div class="header-info">
+          <h2 class="section-title">Quick Actions</h2>
+          <p class="section-subtitle">Manage your platform efficiently</p>
+        </div>
+      </div>
+
+      <div class="actions-grid">
+        
+        <div class="action-card cycles-action" (click)="navigateTo('cycles')">
+          <div class="action-icon-wrapper">
+            <ion-icon name="bicycle-outline"></ion-icon>
+          </div>
+          <div class="action-content">
+            <h3>Manage Cycles</h3>
+            <p>Add, edit, delete, and monitor all cycles in your fleet</p>
+            <div class="action-badge">
+              <span>{{ stats.totalCycles || 0 }} Cycles</span>
+            </div>
+          </div>
+          <div class="action-arrow">
+            <ion-icon name="arrow-forward-outline"></ion-icon>
+          </div>
+        </div>
+
+        <div class="action-card users-action" (click)="navigateTo('users')">
+          <div class="action-icon-wrapper">
+            <ion-icon name="people-outline"></ion-icon>
+          </div>
+          <div class="action-content">
+            <h3>Manage Users</h3>
+            <p>View user profiles, login history, and active sessions</p>
+            <div class="action-badge">
+              <span>{{ stats.totalUsers || 0 }} Users</span>
+            </div>
+          </div>
+          <div class="action-arrow">
+            <ion-icon name="arrow-forward-outline"></ion-icon>
+          </div>
+        </div>
+
+        <div class="action-card transactions-action" (click)="navigateTo('transactions')">
+          <div class="action-icon-wrapper">
+            <ion-icon name="wallet-outline"></ion-icon>
+          </div>
+          <div class="action-content">
+            <h3>View Transactions</h3>
+            <p>Monitor all financial transactions and revenue streams</p>
+            <div class="action-badge">
+              <span>₹{{ formatCurrency(stats.totalRevenue || 0) }}</span>
+            </div>
+          </div>
+          <div class="action-arrow">
+            <ion-icon name="arrow-forward-outline"></ion-icon>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</ion-content>

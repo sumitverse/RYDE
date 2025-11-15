@@ -5,9 +5,13 @@ import {
   IonContent,
   IonHeader,
   IonToolbar,
-  IonTitle
+  IonTitle,
+  IonButton,
+  IonIcon
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../shared/header/header.component';
+import { addIcons } from 'ionicons';
+import { qrCodeOutline, checkmarkCircleOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tab3',
@@ -20,7 +24,9 @@ import { HeaderComponent } from '../shared/header/header.component';
     IonContent,
     IonHeader,
     IonToolbar,
-    IonTitle
+    IonTitle,
+    IonButton,
+    IonIcon
   ]
 })
 export class Tab3Page implements OnInit, ViewWillEnter {
@@ -29,16 +35,27 @@ export class Tab3Page implements OnInit, ViewWillEnter {
   userAvatar: string = '';
   notificationCount: number = 0;
 
-  constructor() {}
+  // QR Scanning states: 'idle', 'scanning', 'success'
+  scanningState: 'idle' | 'scanning' | 'success' = 'idle';
+  isScanning: boolean = false;
+  qrImageError: boolean = false;
+
+  constructor() {
+    addIcons({ qrCodeOutline, checkmarkCircleOutline });
+  }
 
   ngOnInit() {
     this.loadUserFromStorage();
     this.updateNotificationCount();
+    // Start scanning animation directly
+    this.startScanning();
   }
 
   ionViewWillEnter() {
     this.loadUserFromStorage();
     this.updateNotificationCount();
+    // Start scanning animation directly when entering the page
+    this.startScanning();
   }
 
   loadUserFromStorage() {
@@ -74,5 +91,26 @@ export class Tab3Page implements OnInit, ViewWillEnter {
     } else {
       this.notificationCount = 0;
     }
+  }
+
+  startScanning() {
+    if (this.isScanning) return;
+    
+    this.isScanning = true;
+    this.scanningState = 'scanning';
+    
+    // Simulate QR scanning process (2-3 seconds)
+    setTimeout(() => {
+      this.scanningState = 'success';
+      this.isScanning = false;
+      
+      // Keep showing success and QR image (don't auto-reset)
+      // User can manually refresh or navigate away
+    }, 2500);
+  }
+
+  onQrImageError(event: any) {
+    this.qrImageError = true;
+    console.error('QR image failed to load:', event);
   }
 }

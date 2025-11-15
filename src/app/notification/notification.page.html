@@ -43,6 +43,13 @@
         <div class="notification-details">
           <div class="notification-header-row">
             <h4 class="notification-title">{{ notification.title }}</h4>
+            <ion-button 
+              fill="clear" 
+              class="delete-btn" 
+              (click)="deleteNotification(notification.id); $event.stopPropagation()"
+              title="Delete notification">
+              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+            </ion-button>
           </div>
           <p class="notification-message">{{ notification.message }}</p>
           <div class="notification-footer">

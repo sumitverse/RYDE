@@ -31,6 +31,7 @@ import {
   notificationsOutline,
   notifications,
   chevronBackOutline,
+  chevronForwardOutline,
   checkmarkDoneOutline,
   trashOutline
 } from 'ionicons/icons';
@@ -88,6 +89,7 @@ export class NotificationPage implements OnInit, ViewWillEnter {
       notificationsOutline,
       notifications,
       chevronBackOutline,
+      chevronForwardOutline,
       checkmarkDoneOutline,
       trashOutline
     });

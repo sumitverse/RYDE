@@ -92,7 +92,7 @@ export class Tab5Page implements OnInit, ViewWillEnter {
     { icon: 'help-circle-outline', label: 'Help & Support', route: '/help-and-support', badge: null },
     { icon: 'shield-checkmark-outline', label: 'Privacy Policy', route: '/privacy', badge: null },
     { icon: 'information-circle-outline', label: 'About Us', route: '/about', badge: null },
-    { icon: 'people-outline', label: 'About Developers', route: '', badge: null }
+    { icon: 'people-outline', label: 'About Developers', route: '/aboutdev', badge: null }
   ];
 
   achievements = [

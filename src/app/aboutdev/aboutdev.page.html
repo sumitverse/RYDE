@@ -1,0 +1,91 @@
+<ion-header [translucent]="true" class="aboutdev-header">
+  <ion-toolbar color="transparent" class="header-toolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" class="back-button">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="header-title">About Developers</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="aboutdev-content">
+
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-background"></div>
+    <div class="hero-content">
+      <div class="hero-icon-wrapper animate-fade-in">
+        <ion-icon name="people-outline" class="hero-icon"></ion-icon>
+      </div>
+      <h1 class="hero-title animate-slide-up">Meet Our Team</h1>
+      <p class="hero-subtitle animate-slide-up-delay">Passionate developers from Lovely Professional University</p>
+    </div>
+  </div>
+
+  <!-- Team Info Card -->
+  <div class="team-info-section animate-fade-in-delay">
+    <ion-card class="team-info-card">
+      <ion-card-content>
+        <div class="team-info-content">
+          <ion-icon name="school-outline" class="info-icon"></ion-icon>
+          <div class="info-text">
+            <h3>BCA Students</h3>
+            <p>Lovely Professional University</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Developers Grid -->
+  <div class="developers-section">
+    <div
+      *ngFor="let developer of developers; let i = index"
+      class="developer-card-wrapper"
+      [style.animation-delay]="(i * 0.15) + 's'">
+      <ion-card class="developer-card" [attr.data-index]="i">
+        <ion-card-content>
+          <div class="developer-content">
+            <!-- Avatar with animated border -->
+            <div class="avatar-container">
+              <div class="avatar-ring"></div>
+              <ion-avatar class="developer-avatar">
+                <img [src]="developer.avatar" [alt]="developer.name" />
+              </ion-avatar>
+              <div class="avatar-glow"></div>
+            </div>
+
+            <!-- Developer Info -->
+            <div class="developer-info">
+              <h2 class="developer-name">{{ developer.name }}</h2>
+              <div class="developer-role">
+                <ion-icon name="person-outline"></ion-icon>
+                <span>{{ developer.role }}</span>
+              </div>
+              <div class="developer-university">
+                <ion-icon name="school-outline"></ion-icon>
+                <span>{{ developer.university }}</span>
+              </div>
+              <div class="developer-degree">
+                <ion-icon name="ribbon-outline"></ion-icon>
+                <span>{{ developer.degree }}</span>
+              </div>
+            </div>
+
+            <!-- Decorative Elements -->
+            <div class="card-decoration"></div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+
+  <!-- Footer Section -->
+  <div class="footer-section">
+    <div class="footer-content">
+      <p>Made with <ion-icon name="heart" class="heart-icon"></ion-icon> by sumitverse</p>
+    </div>
+  </div>
+
+</ion-content>

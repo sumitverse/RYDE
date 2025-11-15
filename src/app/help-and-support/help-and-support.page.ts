@@ -59,6 +59,7 @@ interface Message {
   ]
 })
 export class HelpAndSupportPage implements OnInit, AfterViewInit {
+  // Help and support component
   @ViewChild('chatContainer', { static: false }) chatContainer!: ElementRef;
   @ViewChild('messageInput', { static: false }) messageInput!: ElementRef;
 

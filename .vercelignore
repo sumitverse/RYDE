@@ -5,11 +5,13 @@ node_modules
 *.log
 .DS_Store
 capacitor.config.ts
-ionic.config.json
 karma.conf.js
-tsconfig*.json
-src
-angular.json
 *.md
 !README.md
+www
+dist
+coverage
+.ionic
+platforms
+plugins
 

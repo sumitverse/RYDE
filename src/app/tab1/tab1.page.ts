@@ -55,11 +55,15 @@ import {
   sunnyOutline,
   cloudOutline,
   checkmarkCircleOutline,
-  checkmarkCircle
+  checkmarkCircle,
+  constructOutline,
+  alertCircleOutline
 } from 'ionicons/icons';
 import { Observable, forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { HeaderComponent } from '../shared/header/header.component';
+import { WalletService } from '../services/wallet.service';
+import { AdminService } from '../services/admin.service';
 
 // Leaflet - will be loaded dynamically
 let L: any;
@@ -73,6 +77,7 @@ interface Cycle {
   distance?: number;
   condition?: string;
   location?: string;
+  status?: 'available' | 'booked' | 'maintenance';
 }
 
 interface Offer {
@@ -178,6 +183,8 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
     condition: 'sunny',
     icon: 'sunny-outline'
   };
+  currentLat: number = 0;
+  currentLng: number = 0;
 
   quickActions = [
     { icon: 'navigate-outline', label: 'Find Nearest', color: 'primary' },
@@ -196,7 +203,9 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
     private toastController: ToastController,
     private alertController: AlertController,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private walletService: WalletService,
+    private adminService: AdminService
   ) {
     addIcons({
       locationOutline,
@@ -224,7 +233,9 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
       sunnyOutline,
       cloudOutline,
       checkmarkCircleOutline,
-      checkmarkCircle
+      checkmarkCircle,
+      constructOutline,
+      alertCircleOutline
     });
   }
 
@@ -240,10 +251,10 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
     // Clear any stale active rides first, then load valid ones
     this.validateAndLoadActiveRide();
     this.loadData();
-    this.getCurrentLocation();
+    this.getCurrentLocation(); // This will call loadWeather() after getting location
     this.loadStats();
     this.loadFavorites();
-    this.loadWeather();
+    // loadWeather() is called by getCurrentLocation() after location is retrieved
     this.loadRecentActivity();
     this.updateNotificationCount();
     // Request notification permission on app load
@@ -485,7 +496,7 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
     'https://tse1.mm.bing.net/th/id/OIP.MovCtlrCMEag-lrXyCLFKAHaEK?cb=ucfimgc2&rs=1&pid=ImgDetMain&o=7&rm=3'
   ];
 
-  // Array of different cycle names
+  // Array of different cycle names - expanded list for uniqueness
   private cycleNames: string[] = [
     'Hercules Storm NV 17',
     'Atlas L Super Strong',
@@ -511,7 +522,33 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
     'Ridley Helium',
     'Wilier Zero',
     'Factor O2',
-    'Argon 18 Gallium'
+    'Argon 18 Gallium',
+    'Fuji Roubaix',
+    'Kona Rove',
+    'Surly Straggler',
+    'Salsa Vaya',
+    'All-City Space Horse',
+    'Jamis Renegade',
+    'Raleigh Tamland',
+    'Niner RLT',
+    'Soma Double Cross',
+    'Breezer Radar',
+    'Marin Four Corners',
+    'Diamondback Haanjo',
+    'GT Grade',
+    'Norco Search',
+    'Rocky Mountain Solo',
+    'Santa Cruz Stigmata',
+    'Open UP',
+    '3T Exploro',
+    'Canyon Grail',
+    'Specialized Diverge',
+    'Trek Checkpoint',
+    'Giant Revolt',
+    'Cannondale Topstone',
+    'BMC URS',
+    'Scott Addict Gravel',
+    'Merida Silex'
   ];
 
   getCycleImage(cycleId: number, index: number): string {
@@ -521,11 +558,25 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
     return this.cycleImages[imageIndex];
   }
 
-  getCycleName(cycleId: number, index: number): string {
-    // Use cycleId and index to ensure different names for different cycles
-    // This ensures variety even when reloading
+  getCycleName(cycleId: number, index: number, usedNames: Set<string> = new Set()): string {
+    // Use cycleId and index to get a base name
     const nameIndex = (cycleId + index) % this.cycleNames.length;
-    return this.cycleNames[nameIndex];
+    let baseName = this.cycleNames[nameIndex];
+    
+    // If name already exists, add a suffix to make it unique
+    if (usedNames.has(baseName)) {
+      let counter = 1;
+      let uniqueName = `${baseName} #${counter}`;
+      while (usedNames.has(uniqueName)) {
+        counter++;
+        uniqueName = `${baseName} #${counter}`;
+      }
+      usedNames.add(uniqueName);
+      return uniqueName;
+    }
+    
+    usedNames.add(baseName);
+    return baseName;
   }
 
   fetchCycles(skip: number = 0): Observable<Cycle[]> {
@@ -545,28 +596,123 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
 
     return this.http.get<{ products: any[] }>(`https://dummyjson.com/products?limit=5&skip=${skip}`).pipe(
       map(response => {
+        // Get admin-managed cycles from localStorage
+        const adminCycles = this.adminService.getAllCycles();
+        const adminCyclesMap = new Map(adminCycles.map(c => [c.id, c]));
+        
+        // Track used names to ensure uniqueness
+        const usedNames = new Set<string>();
+        
         const cycles = response.products.map((product, index) => {
           const cycleId = product.id;
-          const nameIndex = (cycleId + skip + index) % this.cycleNames.length;
           const locationIndex = (cycleId + skip + index) % locations.length;
           const conditionIndex = (cycleId + skip + index) % conditions.length;
+          
+          // Check if this cycle is managed by admin
+          const adminCycle = adminCyclesMap.get(cycleId);
+          
+          // Get unique cycle name if not managed by admin
+          let cycleTitle = adminCycle?.title;
+          if (!cycleTitle || cycleTitle.trim() === '') {
+            cycleTitle = this.getCycleName(cycleId, skip + index, usedNames);
+          } else {
+            // Check if admin title is already used, make it unique if needed
+            if (usedNames.has(cycleTitle)) {
+              let counter = 1;
+              let uniqueTitle = `${cycleTitle} #${counter}`;
+              while (usedNames.has(uniqueTitle)) {
+                counter++;
+                uniqueTitle = `${cycleTitle} #${counter}`;
+              }
+              cycleTitle = uniqueTitle;
+            }
+            usedNames.add(cycleTitle);
+          }
+          
           return {
             id: cycleId,
-            title: this.getCycleName(cycleId, skip + index),
-            price: Math.floor(Math.random() * 4) + 1, // 1-5 INR per minute
-            thumbnail: this.getCycleImage(cycleId, skip + index),
-            battery: Math.floor(Math.random() * 40) + 60,
-            distance: Math.round((Math.random() * 1.9 + 0.1) * 100) / 100, // Round to 2 decimal places
-            condition: conditions[conditionIndex],
-            location: locations[locationIndex]
+            title: cycleTitle,
+            price: adminCycle?.price || Math.floor(Math.random() * 4) + 1,
+            thumbnail: adminCycle?.thumbnail || this.getCycleImage(cycleId, skip + index),
+            battery: adminCycle?.battery !== undefined ? adminCycle.battery : Math.floor(Math.random() * 40) + 60,
+            distance: adminCycle?.distance !== undefined ? adminCycle.distance : Math.round((Math.random() * 1.9 + 0.1) * 100) / 100,
+            condition: adminCycle?.condition || conditions[conditionIndex],
+            location: adminCycle?.location || locations[locationIndex],
+            status: adminCycle?.status || 'available' // Default to available if not set
           };
         });
+        
+        // Merge with admin cycles that might not be in API response
+        adminCycles.forEach(adminCycle => {
+          if (!cycles.find(c => c.id === adminCycle.id)) {
+            let cycleTitle = adminCycle.title;
+            // Ensure unique name for admin cycles
+            if (!cycleTitle || cycleTitle.trim() === '') {
+              cycleTitle = this.getCycleName(adminCycle.id, 0, usedNames);
+            } else if (usedNames.has(cycleTitle)) {
+              let counter = 1;
+              let uniqueTitle = `${cycleTitle} #${counter}`;
+              while (usedNames.has(uniqueTitle)) {
+                counter++;
+                uniqueTitle = `${cycleTitle} #${counter}`;
+              }
+              cycleTitle = uniqueTitle;
+            }
+            usedNames.add(cycleTitle);
+            
+            cycles.push({
+              id: adminCycle.id,
+              title: cycleTitle,
+              price: adminCycle.price,
+              thumbnail: adminCycle.thumbnail,
+              battery: adminCycle.battery || 100,
+              distance: adminCycle.distance || 0,
+              condition: adminCycle.condition || 'excellent',
+              location: adminCycle.location || 'Unknown',
+              status: adminCycle.status
+            });
+          }
+        });
+        
         // Save cycles to localStorage for details page access
         localStorage.setItem('cycles', JSON.stringify(cycles));
         return cycles;
       }),
       catchError(error => {
         console.error('Error fetching cycles:', error);
+        // Fallback to admin cycles if API fails
+        const adminCycles = this.adminService.getAllCycles();
+        if (adminCycles.length > 0) {
+          const usedNames = new Set<string>();
+          return of(adminCycles.map((c, index) => {
+            let cycleTitle = c.title;
+            // Ensure unique name for admin cycles
+            if (!cycleTitle || cycleTitle.trim() === '') {
+              cycleTitle = this.getCycleName(c.id, index, usedNames);
+            } else if (usedNames.has(cycleTitle)) {
+              let counter = 1;
+              let uniqueTitle = `${cycleTitle} #${counter}`;
+              while (usedNames.has(uniqueTitle)) {
+                counter++;
+                uniqueTitle = `${cycleTitle} #${counter}`;
+              }
+              cycleTitle = uniqueTitle;
+            }
+            usedNames.add(cycleTitle);
+            
+            return {
+              id: c.id,
+              title: cycleTitle,
+              price: c.price,
+              thumbnail: c.thumbnail,
+              battery: c.battery || 100,
+              distance: c.distance || 0,
+              condition: c.condition || 'excellent',
+              location: c.location || 'Unknown',
+              status: c.status
+            };
+          }));
+        }
         return of([]);
       })
     );
@@ -614,7 +760,11 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          this.currentLat = position.coords.latitude;
+          this.currentLng = position.coords.longitude;
           this.reverseGeocode(position.coords.latitude, position.coords.longitude);
+          // Fetch real weather data after getting location
+          this.loadWeather();
           if (this.map) {
             this.map.setView([position.coords.latitude, position.coords.longitude], 15);
           }
@@ -623,11 +773,19 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
           console.error('Geolocation error:', error);
           this.currentLocation = 'Location unavailable';
           this.showToast('Location access denied. Using default location.', 'warning');
+          // Use default coordinates (New York) if location is denied
+          this.currentLat = 40.7128;
+          this.currentLng = -74.0060;
+          this.loadWeather();
         }
       );
 
       this.locationWatchId = navigator.geolocation.watchPosition(
         (position) => {
+          this.currentLat = position.coords.latitude;
+          this.currentLng = position.coords.longitude;
+          // Update weather when location changes
+          this.loadWeather();
           if (this.map) {
             this.map.setView([position.coords.latitude, position.coords.longitude], 15);
           }
@@ -635,6 +793,10 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
       );
     } else {
       this.currentLocation = 'Location not supported';
+      // Use default coordinates if geolocation is not supported
+      this.currentLat = 40.7128;
+      this.currentLng = -74.0060;
+      this.loadWeather();
     }
   }
 
@@ -737,6 +899,19 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
       this.showToast('You already have an active ride!', 'warning');
       return;
     }
+    
+    // Check cycle status - prevent booking if in maintenance
+    if (cycle.status === 'maintenance') {
+      this.showToast('This cycle is currently under maintenance and cannot be booked.', 'warning');
+      return;
+    }
+    
+    // Check if cycle is already booked
+    if (cycle.status === 'booked') {
+      this.showToast('This cycle is already booked by another user.', 'warning');
+      return;
+    }
+    
     // Validate cycle data before booking
     if (!cycle || !cycle.title || !cycle.price) {
       this.showToast('Invalid cycle data. Please try again.', 'danger');
@@ -748,55 +923,97 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
       this.showToast('Invalid cycle price. Please try again.', 'danger');
       return;
     }
+    
     // Check for applied coupon
     const appliedCoupon = this.getAppliedCoupon();
-    // Create active ride
-    const startTime = new Date();
-    // Ensure cycle object has all required properties
-    const validCycle = {
-      ...cycle,
-      title: cycle.title,
-      price: cyclePrice
-    };
-    const activeRide: ActiveRide = {
-      cycle: validCycle,
-      startTime,
-      duration: 0,
-      fare: 0,
-      originalFare: 0,
-      discount: 0,
-      discountPercent: appliedCoupon?.discountPercent || 0,
-      couponId: appliedCoupon?.id,
-      couponTitle: appliedCoupon?.title
-    };
-    this.activeRide = activeRide;
-    // Clear the rideEnded flag when starting a new ride
-    localStorage.removeItem('rideEnded');
-    // Save with startTime as ISO string for proper storage
-    const rideToSave = {
-      cycle: this.activeRide.cycle,
-      startTime: startTime.toISOString(),
-      duration: this.activeRide.duration,
-      fare: this.activeRide.fare,
-      originalFare: this.activeRide.originalFare || 0,
-      discount: this.activeRide.discount || 0,
-      discountPercent: this.activeRide.discountPercent || 0,
-      couponId: this.activeRide.couponId,
-      couponTitle: this.activeRide.couponTitle
-    };
-    localStorage.setItem('activeRide', JSON.stringify(rideToSave));
-    // Save cycle data for booked page (as fallback)
-    localStorage.setItem('bookedCycle', JSON.stringify(validCycle));
-    // Clear applied coupon after booking (one-time use)
-    if (appliedCoupon) {
-      localStorage.removeItem('appliedCoupon');
-    }
-    // Send booking confirmation notification
-    this.sendBookingNotification(validCycle.title);
-    // Navigate to booked page with cycle data
-    this.router.navigate(['/booked'], {
-      state: { cycle: validCycle }
+    
+    // Show booking confirmation modal
+    // Note: Fare will be calculated and deducted when the ride ends
+    const alert = await this.alertController.create({
+      header: 'Confirm Booking',
+      message: `Book ${cycle.title}?\n\nPrice: ₹${cyclePrice}/min\n\nFare will be calculated based on ride duration and deducted from your wallet when you end the ride.`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Book Now',
+          handler: () => {
+            // Create active ride (fare will be deducted when ride ends)
+            const startTime = new Date();
+            // Ensure cycle object has all required properties
+            const validCycle = {
+              ...cycle,
+              title: cycle.title,
+              price: cyclePrice
+            };
+            const activeRide: ActiveRide = {
+              cycle: validCycle,
+              startTime,
+              duration: 0,
+              fare: 0, // Will be calculated when ride ends
+              originalFare: 0,
+              discount: 0,
+              discountPercent: appliedCoupon?.discountPercent || 0,
+              couponId: appliedCoupon?.id,
+              couponTitle: appliedCoupon?.title
+            };
+            this.activeRide = activeRide;
+            // Clear the rideEnded flag when starting a new ride
+            localStorage.removeItem('rideEnded');
+            // Save with startTime as ISO string for proper storage
+            const rideToSave = {
+              cycle: this.activeRide.cycle,
+              startTime: startTime.toISOString(),
+              duration: this.activeRide.duration,
+              fare: this.activeRide.fare,
+              originalFare: this.activeRide.originalFare || 0,
+              discount: this.activeRide.discount || 0,
+              discountPercent: this.activeRide.discountPercent || 0,
+              couponId: this.activeRide.couponId,
+              couponTitle: this.activeRide.couponTitle
+            };
+            localStorage.setItem('activeRide', JSON.stringify(rideToSave));
+            // Save cycle data for booked page (as fallback)
+            localStorage.setItem('bookedCycle', JSON.stringify(validCycle));
+            
+            // Update cycle status to 'booked' in admin system
+            this.adminService.updateCycle(validCycle.id, { status: 'booked' });
+            
+            // Update cycles in localStorage
+            const savedCycles = localStorage.getItem('cycles');
+            if (savedCycles) {
+              try {
+                const cycles = JSON.parse(savedCycles);
+                const cycleIndex = cycles.findIndex((c: Cycle) => c.id === validCycle.id);
+                if (cycleIndex !== -1) {
+                  cycles[cycleIndex].status = 'booked';
+                  localStorage.setItem('cycles', JSON.stringify(cycles));
+                }
+              } catch (e) {
+                console.error('Error updating cycle status:', e);
+              }
+            }
+            
+            // Clear applied coupon after booking (one-time use)
+            if (appliedCoupon) {
+              localStorage.removeItem('appliedCoupon');
+            }
+            // Send booking confirmation notification
+            this.sendBookingNotification(validCycle.title);
+            // Show success message
+            this.showToast('Booking confirmed! Ride started.', 'success');
+            // Navigate to booked page with cycle data
+            this.router.navigate(['/booked'], {
+              state: { cycle: validCycle }
+            });
+          }
+        }
+      ]
     });
+
+    await alert.present();
   }
 
   getAppliedCoupon(): any {
@@ -812,16 +1029,73 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
     return null;
   }
 
+  // Helper method to calculate the exact final fare at the current moment
+  calculateFinalFare(): { fare: number; originalFare: number; discount: number; duration: number } | null {
+    if (!this.activeRide || !this.activeRide.cycle) {
+      return null;
+    }
+
+    const cyclePrice = parseFloat(this.activeRide.cycle.price.toString());
+    if (isNaN(cyclePrice) || cyclePrice <= 0) {
+      return null;
+    }
+
+    const now = new Date();
+    const diffMs = now.getTime() - this.activeRide.startTime.getTime();
+    
+    if (diffMs < 0) {
+      return null;
+    }
+
+    // Calculate duration in seconds for accurate fare calculation
+    const durationInSeconds = Math.floor(diffMs / 1000);
+    const duration = Math.floor(durationInSeconds / 60);
+    
+    // Calculate fare: price per minute, convert seconds to minutes for accurate calculation
+    const durationInMinutes = durationInSeconds / 60;
+    const originalFare = Math.round(durationInMinutes * cyclePrice * 100) / 100;
+    
+    // Apply discount if coupon is applied
+    const discountPercent = this.activeRide.discountPercent || 0;
+    let discount = 0;
+    let finalFare = originalFare;
+    
+    if (discountPercent > 0) {
+      discount = Math.round((originalFare * discountPercent / 100) * 100) / 100;
+      finalFare = Math.round((originalFare - discount) * 100) / 100;
+    }
+
+    return {
+      fare: finalFare,
+      originalFare: originalFare,
+      discount: discount,
+      duration: duration
+    };
+  }
+
   async endRide() {
     if (!this.activeRide) return;
 
+    // Calculate current fare to show in alert
+    const currentFareData = this.calculateFinalFare();
+    if (!currentFareData) {
+      this.showToast('Error calculating fare. Please try again.', 'danger');
+      return;
+    }
+
+    // Update activeRide with latest values for display
+    this.activeRide.fare = currentFareData.fare;
+    this.activeRide.originalFare = currentFareData.originalFare;
+    this.activeRide.discount = currentFareData.discount;
+    this.activeRide.duration = currentFareData.duration;
+
     const rideData = {
-      fare: this.activeRide.fare,
-      discount: this.activeRide.discount || 0,
-      duration: this.activeRide.duration,
+      fare: currentFareData.fare,
+      discount: currentFareData.discount,
+      duration: currentFareData.duration,
       cycleTitle: this.activeRide.cycle.title,
       discountPercent: this.activeRide.discountPercent || 0,
-      originalFare: this.activeRide.originalFare || this.activeRide.fare,
+      originalFare: currentFareData.originalFare,
       couponTitle: this.activeRide.couponTitle
     };
 
@@ -830,6 +1104,7 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
     if (rideData.discount > 0) {
       fareMessage = `Original fare: ₹${rideData.originalFare.toFixed(2)}\nDiscount: -₹${rideData.discount.toFixed(2)} (${rideData.discountPercent}%)\nTotal fare: ₹${rideData.fare.toFixed(2)}`;
     }
+    
     const alert = await this.alertController.create({
       header: 'End Ride',
       message: `Are you sure you want to end your ride?\n\n${fareMessage}`,
@@ -841,40 +1116,88 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
         {
           text: 'End Ride',
           handler: () => {
+            // Use the EXACT fare that was shown in the alert message
+            // This ensures we deduct exactly what the user saw in the modal
+            const exactFareToDeduct = rideData.fare;
+            const exactOriginalFare = rideData.originalFare;
+            const exactDiscount = rideData.discount;
+            const exactDuration = rideData.duration;
+
+            console.log('Deducting exact fare (from modal):', {
+              fare: exactFareToDeduct,
+              originalFare: exactOriginalFare,
+              discount: exactDiscount,
+              duration: exactDuration
+            });
+
             // Calculate distance (mock: 1km per 10 minutes)
-            const estimatedDistance = Math.round(((rideData.duration / 10) || 0.5) * 100) / 100;
+            const estimatedDistance = Math.round(((exactDuration / 10) || 0.5) * 100) / 100;
+            
             // Update stats
             this.totalRides += 1;
             this.totalDistance = Math.round((this.totalDistance + estimatedDistance) * 100) / 100;
             this.totalSaved = Math.round((this.totalSaved + estimatedDistance * 0.3) * 100) / 100; // ₹0.3 per km
             this.carbonSaved = Math.round((this.carbonSaved + estimatedDistance * 0.2) * 100) / 100; // 0.2 kg CO2 per km
+            
             // Save updated stats
             this.saveStats();
+            
             // Save ride to history WITH cycle name BEFORE clearing active ride
-            this.saveRideToHistory(estimatedDistance, rideData.duration, rideData.cycleTitle, rideData.fare);
-            // Deduct discounted fare from wallet and add transaction
-            this.deductFromWallet(rideData.fare, rideData.cycleTitle, rideData.discount, rideData.couponTitle);
+            this.saveRideToHistory(estimatedDistance, exactDuration, rideData.cycleTitle, exactFareToDeduct);
+            
+            // Deduct the EXACT fare amount that was calculated right now
+            // This saves the transaction to localStorage
+            this.deductFromWallet(exactFareToDeduct, rideData.cycleTitle, exactDiscount, rideData.couponTitle);
+            
+            // DIRECTLY UPDATE WALLET BALANCE - Simple and direct approach
+            this.updateWalletBalanceDirectly(exactFareToDeduct);
+            
+            // Update cycle status back to 'available' in admin system
+            if (this.activeRide && this.activeRide.cycle) {
+              this.adminService.updateCycle(this.activeRide.cycle.id, { status: 'available' });
+              
+              // Update cycles in localStorage
+              const savedCycles = localStorage.getItem('cycles');
+              if (savedCycles) {
+                try {
+                  const cycles = JSON.parse(savedCycles);
+                  const cycleIndex = cycles.findIndex((c: Cycle) => c.id === this.activeRide!.cycle.id);
+                  if (cycleIndex !== -1) {
+                    cycles[cycleIndex].status = 'available';
+                    localStorage.setItem('cycles', JSON.stringify(cycles));
+                  }
+                } catch (e) {
+                  console.error('Error updating cycle status:', e);
+                }
+              }
+            }
+            
             // IMPORTANT: Clear active ride from localStorage FIRST to prevent it from reloading
             // Clear all possible ride-related keys to ensure complete cleanup
             localStorage.removeItem('activeRide');
             localStorage.removeItem('bookedCycle');
+            
             // Add a flag to mark that ride was ended (prevents reload on page refresh)
             localStorage.setItem('rideEnded', 'true');
+            
             // Clear the active ride from component immediately
             if (this.rideInterval) {
               clearInterval(this.rideInterval);
               this.rideInterval = null;
             }
             this.activeRide = null;
+            
             // Force change detection to update UI immediately
             this.cdr.detectChanges();
+            
             // Reload recent activity to show the new transaction
             this.loadRecentActivity();
+            
             // Show success message with discount info
-            if (rideData.discount > 0) {
-              this.showToast(`Ride ended! Saved ₹${rideData.discount.toFixed(2)} with coupon! 🎉`, 'success');
+            if (exactDiscount > 0) {
+              this.showToast(`Ride ended! ₹${exactFareToDeduct.toFixed(2)} deducted. Saved ₹${exactDiscount.toFixed(2)} with coupon! 🎉`, 'success');
             } else {
-              this.showToast('Ride ended successfully!', 'success');
+              this.showToast(`Ride ended! ₹${exactFareToDeduct.toFixed(2)} deducted from wallet.`, 'success');
             }
           }
         }
@@ -885,6 +1208,16 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
   }
 
   deductFromWallet(amount: number, cycleName: string, discount: number = 0, couponTitle?: string) {
+    // Ensure amount is a valid positive number - use exact amount passed (already calculated precisely)
+    // Round to 2 decimal places to match currency precision
+    const fareAmount = Math.round(parseFloat(amount.toString()) * 100) / 100;
+    
+    if (isNaN(fareAmount) || fareAmount <= 0) {
+      console.error('Invalid fare amount for wallet deduction:', amount);
+      this.showToast('Error: Invalid fare amount. Please contact support.', 'danger');
+      return;
+    }
+
     // Load existing transactions
     const savedTransactions = localStorage.getItem('walletTransactions');
     let transactions: any[] = [];
@@ -893,30 +1226,122 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
         transactions = JSON.parse(savedTransactions);
       } catch (e) {
         console.error('Error parsing wallet transactions:', e);
+        transactions = [];
       }
     }
+    
     // Build description with discount info
     let description = `Cycle Rental - ${cycleName}`;
     if (discount > 0 && couponTitle) {
       description += ` (${couponTitle} applied, saved ₹${discount.toFixed(2)})`;
     }
-    // Add payment transaction (completed debit)
-    const transaction = {
+    
+    // Add payment transaction (completed debit) - this will be deducted from wallet balance
+    // CRITICAL: Ensure type is 'debit' and amount is a number
+    const transaction: any = {
       id: Date.now().toString(),
-      type: 'debit',
-      amount: amount,
+      type: 'debit', // MUST be 'debit' to subtract from balance - using string not const
+      amount: Number(fareAmount.toFixed(2)), // Ensure it's a number, not string
       description: description,
       date: new Date().toISOString(),
       status: 'completed',
       icon: 'bicycle-outline',
-      discount: discount,
-      couponTitle: couponTitle
+      discount: discount || 0,
+      couponTitle: couponTitle || undefined
     };
+    
+    // FORCE type to be 'debit' - no exceptions
+    transaction.type = 'debit';
+    
+    // Verify transaction before saving
+    console.log('💳 Tab1: Saving transaction:', {
+      type: transaction.type,
+      amount: transaction.amount,
+      description: transaction.description,
+      status: transaction.status
+    });
+    
+    if (transaction.type !== 'debit') {
+      console.error('❌ ERROR: Transaction type is not debit!', transaction.type);
+      this.showToast('Error: Transaction type incorrect.', 'danger');
+      return;
+    }
+    
+    if (typeof transaction.amount !== 'number' || isNaN(transaction.amount)) {
+      console.error('❌ ERROR: Transaction amount is not a valid number!', transaction.amount);
+      this.showToast('Error: Invalid transaction amount.', 'danger');
+      return;
+    }
+    
+    // Add transaction to the beginning of the list (most recent first)
     transactions.unshift(transaction);
+    
     // Keep only last 100 transactions
     transactions = transactions.slice(0, 100);
-    // Save transactions
+    
+    // Save transactions - wallet balance will be recalculated from these transactions
     localStorage.setItem('walletTransactions', JSON.stringify(transactions));
+    
+    // Verify it was saved correctly
+    const verify = localStorage.getItem('walletTransactions');
+    if (verify) {
+      try {
+        const verifyTransactions = JSON.parse(verify);
+        const savedTransaction = verifyTransactions[0];
+        console.log('✅ Transaction saved successfully:', {
+          id: savedTransaction.id,
+          type: savedTransaction.type,
+          amount: savedTransaction.amount,
+          description: savedTransaction.description
+        });
+        
+        // Double-check the saved transaction
+        if (savedTransaction.type !== 'debit') {
+          console.error('❌ CRITICAL: Saved transaction type is not debit! Fixing...');
+          savedTransaction.type = 'debit';
+          localStorage.setItem('walletTransactions', JSON.stringify(verifyTransactions));
+          console.log('✅ Fixed transaction type to debit');
+        }
+        
+        // Verify the transaction was saved correctly
+        console.log('✅ Tab1: Transaction verified after save:', {
+          type: savedTransaction.type,
+          amount: savedTransaction.amount,
+          description: savedTransaction.description
+        });
+      } catch (e) {
+        console.error('Error verifying saved transaction:', e);
+      }
+    }
+    
+    console.log(`✅ Deducted ₹${fareAmount.toFixed(2)} from wallet for: ${cycleName}`);
+  }
+
+  /**
+   * Directly update wallet balance by subtracting the amount
+   * This is a simple, direct approach that updates the balance immediately
+   */
+  updateWalletBalanceDirectly(amountToDeduct: number): void {
+    // Get current wallet balance from localStorage
+    const currentBalanceStr = localStorage.getItem('currentWalletBalance');
+    let currentBalance = currentBalanceStr ? parseFloat(currentBalanceStr) : 250.50;
+    
+    // If no balance exists, calculate from initial balance
+    if (!currentBalanceStr) {
+      const initialBalance = localStorage.getItem('initialWalletBalance');
+      currentBalance = initialBalance ? parseFloat(initialBalance) : 250.50;
+    }
+    
+    // Subtract the amount
+    const newBalance = Math.max(0, Math.round((currentBalance - amountToDeduct) * 100) / 100);
+    
+    // Save the new balance directly to localStorage
+    localStorage.setItem('currentWalletBalance', newBalance.toString());
+    
+    // Also update the WalletService to notify Tab4
+    this.walletService.setBalanceDirectly(newBalance);
+    
+    console.log(`💰 Tab1: Directly updated wallet balance: ₹${currentBalance.toFixed(2)} - ₹${amountToDeduct.toFixed(2)} = ₹${newBalance.toFixed(2)}`);
   }
 
   saveRideToHistory(distance: number, duration: number, cycleName?: string, fare?: number) {
@@ -1505,26 +1930,142 @@ export class Tab1Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
   }
 
   loadWeather() {
+    // Check if there's a saved location preference
     const saved = localStorage.getItem('selectedWeatherLocation');
     if (saved) {
       try {
         const savedLocation = JSON.parse(saved);
-        this.weather = {
-          temp: savedLocation.temp,
-          condition: savedLocation.condition,
-          icon: savedLocation.icon
-        };
-        return;
+        // If saved location has coordinates, use them for real-time data
+        if (savedLocation.lat && savedLocation.lng) {
+          this.fetchWeatherData(savedLocation.lat, savedLocation.lng);
+          return;
+        } else if (savedLocation.temp && savedLocation.condition) {
+          // Use saved weather data if no coordinates but data exists
+          this.weather = {
+            temp: savedLocation.temp,
+            condition: savedLocation.condition,
+            icon: savedLocation.icon
+          };
+          return;
+        }
       } catch (e) {
         console.error('Error loading saved weather:', e);
       }
     }
 
-    const hour = new Date().getHours();
-    if (hour >= 6 && hour < 18) {
-      this.weather = { temp: 22, condition: 'sunny', icon: 'sunny-outline' };
+    // Fetch real weather data using current location coordinates
+    if (this.currentLat !== 0 && this.currentLng !== 0) {
+      this.fetchWeatherData(this.currentLat, this.currentLng);
     } else {
-      this.weather = { temp: 18, condition: 'cloudy', icon: 'cloud-outline' };
+      // If no location yet, wait for location or use default
+      // This will be called again once location is available
+      if (navigator.geolocation) {
+        // Location is being fetched, wait for it
+        return;
+      } else {
+        // Use default coordinates if geolocation not available
+        this.currentLat = 40.7128;
+        this.currentLng = -74.0060;
+        this.fetchWeatherData(this.currentLat, this.currentLng);
+      }
+    }
+  }
+
+  fetchWeatherData(lat: number, lng: number) {
+    // Using OpenWeatherMap API with provided API key
+    // This provides real-time current weather data
+    const apiKey = '77403a8034684bd5df80c41671156d52';
+    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${apiKey}&units=metric`;
+    
+    this.http.get<any>(weatherUrl).pipe(
+      catchError(error => {
+        console.error('Error fetching weather data:', error);
+        // Show error but don't set dummy data - just keep current weather
+        this.showToast('Unable to fetch weather data. Please try again later.', 'warning');
+        return of(null);
+      })
+    ).subscribe({
+      next: (data) => {
+        if (data && data.main && data.weather && data.weather.length > 0) {
+          const temp = Math.round(data.main.temp);
+          const weatherId = data.weather[0].id;
+          const weatherMain = data.weather[0].main;
+          const weatherDescription = data.weather[0].description;
+          
+          // Map weather ID and main condition to conditions and icons
+          const { condition, icon } = this.getWeatherCondition(weatherId, weatherMain);
+          
+          this.weather = {
+            temp: temp,
+            condition: condition,
+            icon: icon
+          };
+          
+          // Trigger change detection to update UI
+          this.cdr.detectChanges();
+          
+          console.log('Weather updated:', this.weather);
+        }
+      }
+    });
+  }
+
+  getWeatherCondition(weatherId: number, weatherMain: string): { condition: string; icon: string } {
+    // OpenWeatherMap weather ID mapping
+    // Weather IDs: https://openweathermap.org/weather-conditions
+    
+    // Clear sky
+    if (weatherId === 800) {
+      return { condition: 'clear', icon: 'sunny-outline' };
+    }
+    // Clouds
+    else if (weatherId === 801 || weatherId === 802) {
+      return { condition: 'partly cloudy', icon: 'cloud-outline' };
+    }
+    else if (weatherId === 803 || weatherId === 804) {
+      return { condition: 'cloudy', icon: 'cloud-outline' };
+    }
+    // Rain
+    else if (weatherId >= 200 && weatherId < 300) {
+      return { condition: 'thunderstorm', icon: 'flash-outline' };
+    }
+    else if (weatherId >= 300 && weatherId < 400) {
+      return { condition: 'drizzle', icon: 'cloud-outline' };
+    }
+    else if (weatherId >= 500 && weatherId < 600) {
+      if (weatherId === 500 || weatherId === 501) {
+        return { condition: 'rainy', icon: 'flash-outline' };
+      } else {
+        return { condition: 'heavy rain', icon: 'flash-outline' };
+      }
+    }
+    // Snow
+    else if (weatherId >= 600 && weatherId < 700) {
+      return { condition: 'snowy', icon: 'cloud-outline' };
+    }
+    // Atmosphere (mist, fog, etc.)
+    else if (weatherId >= 700 && weatherId < 800) {
+      return { condition: 'foggy', icon: 'cloud-outline' };
+    }
+    // Fallback based on main condition
+    else {
+      const mainLower = weatherMain.toLowerCase();
+      if (mainLower.includes('clear')) {
+        return { condition: 'clear', icon: 'sunny-outline' };
+      } else if (mainLower.includes('cloud')) {
+        return { condition: 'cloudy', icon: 'cloud-outline' };
+      } else if (mainLower.includes('rain')) {
+        return { condition: 'rainy', icon: 'flash-outline' };
+      } else if (mainLower.includes('snow')) {
+        return { condition: 'snowy', icon: 'cloud-outline' };
+      } else if (mainLower.includes('thunderstorm')) {
+        return { condition: 'thunderstorm', icon: 'flash-outline' };
+      } else if (mainLower.includes('mist') || mainLower.includes('fog')) {
+        return { condition: 'foggy', icon: 'cloud-outline' };
+      } else {
+        // Default to cloudy
+        return { condition: 'cloudy', icon: 'cloud-outline' };
+      }
     }
   }
 

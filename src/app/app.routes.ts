@@ -69,4 +69,37 @@ export const routes: Routes = [
     path: 'about',
     loadComponent: () => import('./about/about.page').then( m => m.AboutPage)
   },
+  {
+    path: 'payment-gateway',
+    loadComponent: () => import('./payment-gateway/payment-gateway.page').then((m) => m.PaymentGatewayPage)
+  },
+  {
+    path: 'admin',
+    loadComponent: () => import('./admin/admin-dashboard/admin-dashboard.page').then( m => m.AdminDashboardPage)
+  },
+  {
+    path: 'admin/cycles',
+    loadComponent: () => import('./admin/admin-cycles/admin-cycles.page').then( m => m.AdminCyclesPage)
+  },
+  {
+    path: 'admin/users',
+    loadComponent: () => import('./admin/admin-users/admin-users.page').then( m => m.AdminUsersPage)
+  },
+  {
+    path: 'admin/transactions',
+    loadComponent: () => import('./admin/admin-transactions/admin-transactions.page').then( m => m.AdminTransactionsPage)
+  },
+  {
+    path: 'admin/cycles/add',
+    loadComponent: () => import('./admin/add-cycle/add-cycle.page').then( m => m.AddCyclePage)
+  },
+  {
+    path: 'admin/cycles/edit/:id',
+    loadComponent: () => import('./admin/add-cycle/add-cycle.page').then( m => m.AddCyclePage)
+  },
+  {
+    path: 'aboutdev',
+    loadComponent: () => import('./aboutdev/aboutdev.page').then( m => m.AboutdevPage)
+  },
+
 ];

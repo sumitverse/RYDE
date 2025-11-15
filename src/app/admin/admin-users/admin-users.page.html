@@ -1,0 +1,272 @@
+<ion-header [translucent]="true" class="admin-header">
+  <ion-toolbar class="admin-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin" class="back-button"></ion-back-button>
+    </ion-buttons>
+    
+    <div class="header-content">
+      <div class="header-icon-wrapper">
+        <ion-icon name="people-outline"></ion-icon>
+      </div>
+      <div class="header-text">
+        <h1 class="header-title">User Management</h1>
+        <p class="header-subtitle">Manage users and track activity</p>
+      </div>
+    </div>
+    
+    <ion-buttons slot="end">
+      <ion-button (click)="loadData()" fill="clear" class="refresh-btn">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="users-container">
+    
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner></ion-spinner>
+      <p>Loading user data...</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div *ngIf="!isLoading" class="stats-section">
+      <div class="stats-grid">
+        <ion-card class="stat-card stat-primary">
+          <div class="card-background"></div>
+          <ion-card-content class="card-content">
+            <div class="stat-header">
+              <div class="stat-icon-wrapper">
+                <div class="stat-icon">
+                  <ion-icon name="people-outline"></ion-icon>
+                </div>
+              </div>
+            </div>
+            <div class="stat-body">
+              <div class="stat-value">{{ usersWithLogins.length }}</div>
+              <div class="stat-label">Total Users</div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+        
+        <ion-card class="stat-card stat-secondary">
+          <div class="card-background"></div>
+          <ion-card-content class="card-content">
+            <div class="stat-header">
+              <div class="stat-icon-wrapper">
+                <div class="stat-icon">
+                  <ion-icon name="log-in-outline"></ion-icon>
+                </div>
+              </div>
+            </div>
+            <div class="stat-body">
+              <div class="stat-value">{{ loginHistory.length }}</div>
+              <div class="stat-label">Total Logins</div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+        
+        <ion-card class="stat-card stat-success">
+          <div class="card-background"></div>
+          <ion-card-content class="card-content">
+            <div class="stat-header">
+              <div class="stat-icon-wrapper">
+                <div class="stat-icon">
+                  <ion-icon name="time-outline"></ion-icon>
+                </div>
+              </div>
+            </div>
+            <div class="stat-body">
+              <div class="stat-value">{{ activeSessionsCount }}</div>
+              <div class="stat-label">Active Sessions</div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- View Toggle -->
+    <div *ngIf="!isLoading" class="view-toggle">
+      <ion-segment [(ngModel)]="selectedView" (ionChange)="onViewChange($event)">
+        <ion-segment-button value="users">
+          <ion-label>Users</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="logins">
+          <ion-label>Login History</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
+
+    <!-- Search Bar -->
+    <div *ngIf="!isLoading" class="search-section">
+      <ion-searchbar
+        [(ngModel)]="searchQuery"
+        (ionInput)="onSearchChange($event)"
+        [placeholder]="selectedView === 'users' ? 'Search users...' : 'Search login history...'"
+        debounce="300">
+      </ion-searchbar>
+    </div>
+
+    <!-- Users View -->
+    <div *ngIf="!isLoading && selectedView === 'users'" class="users-list">
+      <ion-list *ngIf="filteredUsers.length > 0" class="modern-list">
+        <ion-card *ngFor="let user of filteredUsers" class="user-card">
+          <ion-card-content>
+            <div class="user-card-content">
+              <div class="user-main-info">
+                <ion-avatar class="user-avatar">
+                  <img [src]="'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.userName) + '&background=2563EB&color=fff&size=128&bold=true'"
+                       [alt]="user.userName">
+                </ion-avatar>
+                
+                <div class="user-details">
+                  <h2 class="user-name">{{ user.userName }}</h2>
+                  
+                  <div class="user-info-row">
+                    <div class="info-item">
+                      <ion-icon name="mail-outline" class="info-icon"></ion-icon>
+                      <span class="info-text">{{ user.userEmail }}</span>
+                    </div>
+                  </div>
+                  
+                  <div class="user-meta-grid">
+                    <div class="meta-item" *ngIf="user.lastLogin">
+                      <ion-icon name="calendar-outline" class="meta-icon"></ion-icon>
+                      <div class="meta-content">
+                        <span class="meta-label">Last Login</span>
+                        <span class="meta-value">{{ formatDate(user.lastLogin) }}</span>
+                      </div>
+                    </div>
+                    
+                    <div class="meta-item">
+                      <ion-icon name="log-in-outline" class="meta-icon"></ion-icon>
+                      <div class="meta-content">
+                        <span class="meta-label">Total Logins</span>
+                        <span class="meta-value">{{ user.totalLogins }}</span>
+                      </div>
+                    </div>
+                    
+                    <div class="meta-item" *ngIf="user.totalSessionTime > 0">
+                      <ion-icon name="time-outline" class="meta-icon"></ion-icon>
+                      <div class="meta-content">
+                        <span class="meta-label">Session Time</span>
+                        <span class="meta-value">{{ formatDuration(user.totalSessionTime) }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="user-actions">
+                <ion-chip [color]="hasEmptyWallet(user) ? 'danger' : 'success'" class="wallet-chip">
+                  <ion-icon name="wallet-outline"></ion-icon>
+                  <ion-label>₹{{ getUserWalletBalance(user).toFixed(2) }}</ion-label>
+                </ion-chip>
+                
+                <ion-button 
+                  fill="solid" 
+                  size="small" 
+                  (click)="sendWalletEmptyEmail(user)"
+                  class="send-email-btn"
+                  [color]="hasEmptyWallet(user) ? 'danger' : 'primary'">
+                  <ion-icon name="mail-outline" slot="start"></ion-icon>
+                  Send Email
+                </ion-button>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-list>
+
+      <div *ngIf="filteredUsers.length === 0" class="empty-state">
+        <div class="empty-icon-wrapper">
+          <ion-icon name="people-outline"></ion-icon>
+        </div>
+        <h3>No users found</h3>
+        <p>Try adjusting your search query or filters</p>
+      </div>
+    </div>
+
+    <!-- Login History View -->
+    <div *ngIf="!isLoading && selectedView === 'logins'" class="logins-list">
+      <ion-list *ngIf="loginHistory.length > 0" class="modern-list">
+        <ion-card *ngFor="let login of loginHistory" class="login-card" [class.active-session]="isActiveSession(login)">
+          <ion-card-content>
+            <div class="login-card-content">
+              <div class="login-main-info">
+                <ion-avatar class="login-avatar">
+                  <img [src]="'https://ui-avatars.com/api/?name=' + encodeURIComponent(login.userName) + '&background=10B981&color=fff&size=128&bold=true'"
+                       [alt]="login.userName">
+                  <div class="status-indicator" [class.active]="isActiveSession(login)"></div>
+                </ion-avatar>
+                
+                <div class="login-details">
+                  <div class="login-header">
+                    <h2 class="login-name">{{ login.userName }}</h2>
+                    <ion-chip [color]="isActiveSession(login) ? 'success' : 'medium'" class="status-chip">
+                      <ion-icon [name]="isActiveSession(login) ? 'checkmark-circle-outline' : 'close-circle-outline'"></ion-icon>
+                      <ion-label>{{ isActiveSession(login) ? 'Active' : 'Ended' }}</ion-label>
+                    </ion-chip>
+                  </div>
+                  
+                  <div class="login-info-row">
+                    <div class="info-item">
+                      <ion-icon name="mail-outline" class="info-icon"></ion-icon>
+                      <span class="info-text">{{ login.userEmail }}</span>
+                    </div>
+                  </div>
+                  
+                  <div class="login-meta-grid">
+                    <div class="meta-item">
+                      <ion-icon name="log-in-outline" class="meta-icon login-icon"></ion-icon>
+                      <div class="meta-content">
+                        <span class="meta-label">Login Time</span>
+                        <span class="meta-value">{{ formatDate(login.loginTime) }}</span>
+                      </div>
+                    </div>
+                    
+                    <div class="meta-item" *ngIf="login.logoutTime">
+                      <ion-icon name="log-out-outline" class="meta-icon logout-icon"></ion-icon>
+                      <div class="meta-content">
+                        <span class="meta-label">Logout Time</span>
+                        <span class="meta-value">{{ formatDate(login.logoutTime) }}</span>
+                      </div>
+                    </div>
+                    
+                    <div class="meta-item" *ngIf="login.sessionDuration">
+                      <ion-icon name="time-outline" class="meta-icon duration-icon"></ion-icon>
+                      <div class="meta-content">
+                        <span class="meta-label">Duration</span>
+                        <span class="meta-value">{{ formatDuration(login.sessionDuration) }}</span>
+                      </div>
+                    </div>
+                    
+                    <div class="meta-item" *ngIf="login.deviceInfo">
+                      <ion-icon name="phone-portrait-outline" class="meta-icon device-icon"></ion-icon>
+                      <div class="meta-content">
+                        <span class="meta-label">Device</span>
+                        <span class="meta-value">{{ login.deviceInfo }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-list>
+
+      <div *ngIf="loginHistory.length === 0" class="empty-state">
+        <div class="empty-icon-wrapper">
+          <ion-icon name="log-in-outline"></ion-icon>
+        </div>
+        <h3>No login history</h3>
+        <p>User login history will appear here</p>
+      </div>
+    </div>
+
+  </div>
+</ion-content>
+

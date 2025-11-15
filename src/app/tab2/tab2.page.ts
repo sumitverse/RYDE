@@ -106,6 +106,8 @@ export class Tab2Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
   markers: any[] = [];
   userMarker: any = null;
   selectedCycle: Cycle | null = null;
+  routePolyline: any = null; // Store the route line
+  isRouteLoading: boolean = false; // Loading state for route
 
   // LPU Campus coordinates (Phagwara, Punjab, India)
   lpuCampus = {
@@ -187,6 +189,7 @@ export class Tab2Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
     if (this.locationWatchId !== null) {
       navigator.geolocation.clearWatch(this.locationWatchId);
     }
+    this.clearRoute();
     if (this.map) {
       this.map.remove();
     }
@@ -496,6 +499,9 @@ export class Tab2Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
     this.markers.forEach(marker => this.map?.removeLayer(marker));
     this.markers = [];
 
+    // Clear route when markers are updated
+    this.clearRoute();
+
     // Add markers for available cycles
     this.filteredCycles.forEach((cycle) => {
       if (cycle.lat && cycle.lng) {
@@ -626,6 +632,9 @@ export class Tab2Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
     }
 
     this.filteredCycles = filtered;
+    // Clear route when filtering
+    this.clearRoute();
+    this.selectedCycle = null;
     this.updateMapMarkers();
   }
 
@@ -634,6 +643,10 @@ export class Tab2Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
     this.showCycleList = true;
     if (this.map && cycle.lat && cycle.lng) {
       this.map.setView([cycle.lat, cycle.lng], 18);
+      
+      // Draw route from user location to cycle
+      this.drawRouteToCycle(cycle);
+      
       // Open popup for the selected cycle marker
       setTimeout(() => {
         const marker = this.markers.find(m => {
@@ -645,6 +658,165 @@ export class Tab2Page implements OnInit, AfterViewInit, OnDestroy, ViewWillEnter
         }
       }, 300);
     }
+  }
+
+  drawRouteToCycle(cycle: Cycle) {
+    if (!this.map || !L || !cycle.lat || !cycle.lng) return;
+
+    // Remove existing route if any
+    if (this.routePolyline) {
+      this.map.removeLayer(this.routePolyline);
+      this.routePolyline = null;
+    }
+
+    // Check if user location is available
+    if (!this.userLocation) {
+      // If user location not available, try to get it
+      this.requestLocation(false, () => {
+        if (this.userLocation) {
+          this.createRoute(this.userLocation.lat, this.userLocation.lng, cycle.lat!, cycle.lng!);
+        }
+      });
+      return;
+    }
+
+    // Create route from user location to cycle
+    this.createRoute(this.userLocation.lat, this.userLocation.lng, cycle.lat!, cycle.lng!);
+  }
+
+  createRoute(startLat: number, startLng: number, endLat: number, endLng: number) {
+    if (!this.map || !L) return;
+
+    this.isRouteLoading = true;
+    this.showToast('Calculating route...', 'primary');
+
+    // Use OSRM (Open Source Routing Machine) for free routing
+    // Format: /route/v1/{profile}/{coordinates}?overview=full&geometries=geojson
+    const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?overview=full&geometries=geojson&alternatives=false`;
+
+    this.http.get<any>(osrmUrl).subscribe({
+      next: (response) => {
+        this.isRouteLoading = false;
+        
+        if (response.code === 'Ok' && response.routes && response.routes.length > 0) {
+          const route = response.routes[0];
+          const geometry = route.geometry;
+          
+          // Decode polyline (OSRM returns encoded polyline)
+          // For GeoJSON format, coordinates are already decoded
+          let routeCoordinates: [number, number][] = [];
+          
+          if (geometry.type === 'LineString' && geometry.coordinates) {
+            // GeoJSON coordinates are [lng, lat], Leaflet needs [lat, lng]
+            routeCoordinates = geometry.coordinates.map((coord: number[]) => [coord[1], coord[0]]);
+          } else {
+            // Fallback: use straight line if decoding fails
+            routeCoordinates = [[startLat, startLng], [endLat, endLng]];
+          }
+
+          // Create polyline with route styling
+          this.routePolyline = L.polyline(routeCoordinates, {
+            color: '#10B981',
+            weight: 6,
+            opacity: 0.9,
+            smoothFactor: 1
+          }).addTo(this.map);
+
+          // Get route distance and duration from OSRM response
+          const distance = route.distance / 1000; // Convert meters to kilometers
+          const duration = Math.round(route.duration / 60); // Convert seconds to minutes
+
+          // Add distance and duration marker in the middle of the route
+          const midIndex = Math.floor(routeCoordinates.length / 2);
+          const midPoint = routeCoordinates[midIndex];
+          
+          const distanceMarker = L.marker(midPoint, {
+            icon: L.divIcon({
+              className: 'route-distance-marker',
+              html: `<div class="route-distance-badge">
+                <div>${distance.toFixed(2)} km</div>
+                <div style="font-size: 0.7em; opacity: 0.9;">${duration} min</div>
+              </div>`,
+              iconSize: [90, 50],
+              iconAnchor: [45, 25]
+            })
+          }).addTo(this.map);
+
+          // Store distance marker to remove later
+          this.routePolyline._distanceMarker = distanceMarker;
+
+          // Fit map to show the entire route with padding
+          const bounds = this.routePolyline.getBounds();
+          this.map.fitBounds(bounds, { padding: [50, 50] });
+
+          this.showToast('Route calculated successfully', 'success');
+        } else {
+          // Fallback to straight line if routing fails
+          this.createFallbackRoute(startLat, startLng, endLat, endLng);
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching route:', error);
+        this.isRouteLoading = false;
+        // Fallback to straight line if API fails
+        this.createFallbackRoute(startLat, startLng, endLat, endLng);
+        this.showToast('Using direct route (routing service unavailable)', 'warning');
+      }
+    });
+  }
+
+  createFallbackRoute(startLat: number, startLng: number, endLat: number, endLng: number) {
+    if (!this.map || !L) return;
+
+    // Create a simple straight line route as fallback
+    const routeCoordinates: [number, number][] = [
+      [startLat, startLng],
+      [endLat, endLng]
+    ];
+
+    this.routePolyline = L.polyline(routeCoordinates, {
+      color: '#10B981',
+      weight: 5,
+      opacity: 0.8,
+      dashArray: '10, 5'
+    }).addTo(this.map);
+
+    // Calculate and display distance
+    const distance = this.calculateDistance(startLat, startLng, endLat, endLng);
+    
+    // Add distance marker in the middle of the route
+    const midLat = (startLat + endLat) / 2;
+    const midLng = (startLng + endLng) / 2;
+    const distanceMarker = L.marker([midLat, midLng], {
+      icon: L.divIcon({
+        className: 'route-distance-marker',
+        html: `<div class="route-distance-badge">${distance.toFixed(2)} km</div>`,
+        iconSize: [80, 30],
+        iconAnchor: [40, 15]
+      })
+    }).addTo(this.map);
+
+    this.routePolyline._distanceMarker = distanceMarker;
+
+    // Fit map to show both points with padding
+    const bounds = L.latLngBounds([[startLat, startLng], [endLat, endLng]]);
+    this.map.fitBounds(bounds, { padding: [50, 50] });
+  }
+
+  clearRoute() {
+    if (this.routePolyline && this.map) {
+      this.map.removeLayer(this.routePolyline);
+      if (this.routePolyline._distanceMarker) {
+        this.map.removeLayer(this.routePolyline._distanceMarker);
+      }
+      this.routePolyline = null;
+    }
+  }
+
+  closeCycleList() {
+    this.showCycleList = false;
+    // Keep the route visible - don't clear selectedCycle or route
+    // The route will remain on the map even when the list is closed
   }
 
   viewCycleDetails(cycle: Cycle) {

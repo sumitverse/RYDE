@@ -161,6 +161,36 @@ $font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI',
   }
 }
 
+::ng-deep .route-distance-marker {
+  background: transparent;
+  border: none;
+
+  .route-distance-badge {
+    background: $gradient-primary;
+    color: white;
+    padding: 0.5rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    white-space: nowrap;
+    border: 2px solid white;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+    line-height: 1.2;
+
+    div {
+      &:first-child {
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+    }
+  }
+}
+
 .map-controls {
   position: absolute;
   top: 1rem;
@@ -202,6 +232,29 @@ $font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI',
 
   ion-icon {
     font-size: 1.2rem;
+  }
+}
+
+.route-loading-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 1rem 1.5rem;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: $primary-color;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease;
+
+  ion-spinner {
+    --color: #10B981;
   }
 }
 

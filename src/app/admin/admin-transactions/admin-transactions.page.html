@@ -1,0 +1,136 @@
+<ion-header [translucent]="true" class="admin-header">
+  <ion-toolbar class="admin-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin"></ion-back-button>
+    </ion-buttons>
+    
+    <ion-title>Transaction Management</ion-title>
+    
+    <ion-buttons slot="end">
+      <ion-button (click)="loadTransactions()" fill="clear">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="transactions-container">
+    
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner></ion-spinner>
+      <p>Loading transactions...</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div *ngIf="!isLoading" class="stats-section">
+      <div class="stats-grid">
+        <ion-card class="stat-card revenue">
+          <ion-card-content>
+            <ion-icon name="cash-outline"></ion-icon>
+            <h3>₹{{ stats.totalRevenue.toFixed(2) }}</h3>
+            <p>Total Revenue</p>
+          </ion-card-content>
+        </ion-card>
+        
+        <ion-card class="stat-card today-revenue">
+          <ion-card-content>
+            <ion-icon name="calendar-outline"></ion-icon>
+            <h3>₹{{ stats.todayRevenue.toFixed(2) }}</h3>
+            <p>Today's Revenue</p>
+          </ion-card-content>
+        </ion-card>
+        
+        <ion-card class="stat-card total">
+          <ion-card-content>
+            <ion-icon name="wallet-outline"></ion-icon>
+            <h3>{{ stats.totalTransactions }}</h3>
+            <p>Total Transactions</p>
+          </ion-card-content>
+        </ion-card>
+        
+        <ion-card class="stat-card completed">
+          <ion-card-content>
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <h3>{{ stats.completedTransactions }}</h3>
+            <p>Completed</p>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- Filter Toggle -->
+    <div *ngIf="!isLoading" class="filter-section">
+      <ion-segment [(ngModel)]="selectedFilter" (ionChange)="onFilterChange($event)">
+        <ion-segment-button value="all">
+          <ion-label>All</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="credit">
+          <ion-label>Credit</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="debit">
+          <ion-label>Debit</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="completed">
+          <ion-label>Completed</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
+
+    <!-- Search Bar -->
+    <div *ngIf="!isLoading" class="search-section">
+      <ion-searchbar
+        [(ngModel)]="searchQuery"
+        (ionInput)="onSearchChange($event)"
+        placeholder="Search transactions..."
+        debounce="300">
+      </ion-searchbar>
+    </div>
+
+    <!-- Transactions List -->
+    <div *ngIf="!isLoading" class="transactions-list">
+      <ion-list *ngIf="filteredTransactions.length > 0">
+        <ion-item *ngFor="let transaction of filteredTransactions" class="transaction-item">
+          <ion-avatar slot="start">
+            <img [src]="'https://ui-avatars.com/api/?name=' + encodeURIComponent(transaction.userName) + '&background=' + (transaction.type === 'credit' ? '10B981' : 'EF4444') + '&color=fff'"
+                 [alt]="transaction.userName">
+          </ion-avatar>
+          
+          <ion-label>
+            <h2>{{ transaction.description }}</h2>
+            <p class="transaction-info">
+              <ion-icon name="person-circle-outline"></ion-icon>
+              {{ transaction.userName }}
+            </p>
+            <p class="transaction-info">
+              <ion-icon name="calendar-outline"></ion-icon>
+              {{ formatDate(transaction.date) }}
+            </p>
+            <p class="transaction-info">
+              <ion-icon [name]="getTypeIcon(transaction.type)"></ion-icon>
+              Transaction ID: {{ transaction.id.substring(0, 12) }}...
+            </p>
+          </ion-label>
+          
+          <div slot="end" class="item-actions">
+            <h3 [class]="transaction.type === 'credit' ? 'credit-amount' : 'debit-amount'">
+              {{ transaction.type === 'credit' ? '+' : '-' }}₹{{ transaction.amount.toFixed(2) }}
+            </h3>
+            <ion-chip [color]="getStatusColor(transaction.status)">
+              {{ transaction.status }}
+            </ion-chip>
+          </div>
+        </ion-item>
+      </ion-list>
+
+      <div *ngIf="filteredTransactions.length === 0" class="empty-state">
+        <ion-icon name="wallet-outline"></ion-icon>
+        <h3>No transactions found</h3>
+        <p>Try adjusting your filters or search query</p>
+      </div>
+    </div>
+
+  </div>
+</ion-content>
+
